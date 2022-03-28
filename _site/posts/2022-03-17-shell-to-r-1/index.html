@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="quarto-0.9.112">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Kittipos Sirivongrungson">
+  <meta name="dcterms.date" content="2022-03-17">
+  <meta name="description" content="A fun tutorial involving zsh &amp; R code">
+  <title>Lightbridge - Open and Create R project from Shell</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+
+  <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+  <script src="../../site_libs/clipboard/clipboard.min.js"></script>
+  <meta name="quarto:offset" content="../../">
+  <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+  <script src="../../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../../site_libs/quarto-search/quarto-search.js"></script>
+  <script src="../../site_libs/quarto-html/quarto.js"></script>
+  <script src="../../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../../site_libs/quarto-html/anchor.min.js"></script>
+  <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+  <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <script id="quarto-search-options" type="application/json">{
+    "location": "navbar",
+    "copy-button": false,
+    "collapse-after": 3,
+    "panel-placement": "end",
+    "type": "overlay",
+    "limit": 20,
+    "language": {
+      "search-no-results-text": "No results",
+      "search-matching-documents-text": "matching documents",
+      "search-copy-link-title": "Copy link to search",
+      "search-hide-matches-text": "Hide additional matches",
+      "search-more-match-text": "more match in this document",
+      "search-more-matches-text": "more matches in this document",
+      "search-clear-button-title": "Clear",
+      "search-detached-cancel-button-title": "Cancel",
+      "search-submit-button-title": "Submit"
+    }
+  }</script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="fullcontent">
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Lightbridge</span>
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">About</a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Lightbridge-KS"><i class="bi bi-github" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full" data-sidebar-align="true">
+
+
+
+<div class="quarto-title-banner color-navbar page-columns page-full"><div class="quarto-title column-body"><h1 class="title display-7">Open and Create R project from Shell</h1><div class="quarto-description"><p>A fun tutorial involving zsh &amp; R code</p></div><div class="quarto-categories"><div class="quarto-category">R</div><div class="quarto-category">Shell</div><div class="quarto-category">Fun-Idea</div></div></div></div><div class="quarto-title-meta"><div><div class="quarto-title-meta-heading">Author</div><div class="quarto-title-meta-contents"><div class="quarto-title-authors"><p>Kittipos Sirivongrungson</p></div></div></div><div><div class="quarto-title-meta-heading">Published</div><div class="quarto-title-meta-contents"><p class="date">March 17, 2022</p></div></div></div></header>
+<p>I am an <strong>R</strong> user who know a little bit of <strong>linux shell</strong>, one day I wonder…</p>
+<ul>
+<li><p>How do I <strong>navigate and open R project</strong> from the shell, and</p></li>
+<li><p>How do I <strong>create R project</strong> from the shell</p></li>
+</ul>
+<p>This blog post will show you how to do that and hopefully you’ll learn something new and enjoy using it!</p>
+<p><strong>What you’ll need</strong></p>
+<ul>
+<li>A basic knowledge of <strong>linux shell</strong> and <strong>shell scripting</strong></li>
+<li>Most of your R project should be in one place</li>
+</ul>
+<p>In the next demonstraction, I’ll walk you through by creating a <strong>shell function</strong> which you have to store it in <code>~/.bashrc</code> or <code>~/.zshrc</code> (or other locations that can be sourced) by yourself.</p>
+<p>Before I started, I using macOs, and my shell is <strong>zsh</strong> running in a Terminal app. If you are using different shell, modify the code correspondingly.</p>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="sourceCode zsh cell-code code-with-copy"><code class="sourceCode zsh"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">$SHELL</span> <span class="at">--version</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-stdout">
+<pre><code>zsh 5.8 (x86_64-apple-darwin21.0)</code></pre>
+</div>
+</div>
+<section id="navigate-open-r-project" class="level1">
+<h1>Navigate &amp; Open R project</h1>
+<section id="quick-navigation" class="level2">
+<h2 class="anchored" data-anchor-id="quick-navigation">Quick Navigation</h2>
+<p>How to navigate to an R project quickly ? Lots of options can do it without using a mouse, e.g.&nbsp;using Spotlight Search in mac, but to day I’ll use <strong>command line</strong>.</p>
+<p>I like to group <em>most</em> of my R projects in a single directory (i.e.&nbsp;<code>R_programming</code>) so that I can navigate easily even with GUI. That will helpful when using CLI too.</p>
+<p>You might already know <code>cd</code> command which change directory of a terminal, but typing <code>cd</code> multiple times can be time consuming.</p>
+<blockquote class="blockquote">
+<p>A simple solution is to creating a <strong>shell function</strong> to change directory to a parent folder which contains R projects.</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode" id="cb3"><pre class="sourceCode zsh cell-code code-with-copy"><code class="sourceCode zsh"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function to change directory</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cdrpg()</span><span class="kw">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">cd</span> <span class="st">"/Users/kittipos/Desktop/R_Programming"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Call function to change directory to `R_Programming/`</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">cdrpg</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Print working directory</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">pwd</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-stdout">
+<pre><code>/Users/kittipos/Desktop/R_Programming</code></pre>
+</div>
+</div>
+<p>In the code above.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<ol type="1">
+<li><p>I define a shell function <code>cdrpg()</code> that change directory to my <code>R_programming</code> folder</p></li>
+<li><p>I execute <code>cdrpg</code>, and the directory is then changed (to call function in shell, you don’t use parenthesis).</p></li>
+<li><p>Call <code>pwd</code> to confirm the location at <code>R_Programming</code> directory</p></li>
+</ol>
+<p>For me, I store this function in a <code>.zsh</code> file that can be sourced by <code>~/.zshrc</code></p>
+<p><strong><code>cd-to.zsh</code></strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode zsh code-with-copy"><code class="sourceCode zsh"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/zsh</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># CD to R_Programming Folder</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cdrpg()</span><span class="kw">{</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">cd</span> <span class="st">"/Users/kittipos/Desktop/R_Programming"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>And, make it executable by:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode zsh code-with-copy"><code class="sourceCode zsh"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x <span class="st">"cd-to.zsh"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>So that every time I open shell, I could call <code>cdrpg</code>, and I would arriving at <code>R_Programming</code> directory.</p>
+<p>And I also define similar functions to <code>cd</code> to other frequently-visited locations in this <code>cd-to.zsh</code> script as well.</p>
+</section>
+<section id="open-r-project" class="level2">
+<h2 class="anchored" data-anchor-id="open-r-project">Open R project</h2>
+<p>After I’ve arrived at <code>R_Programming/</code> and <code>cd</code> to the sub-directory I wanted, I can open R project from shell with the following command</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode zsh code-with-copy"><code class="sourceCode zsh"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">open</span> <span class="pp">*</span>.Rproj</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The result is similar to clicking <code>.Rproj</code> icon to open an RStudio project.</p>
+<p>To save typing, I wrap this into <code>openrpg()</code> function and store it in a shell script which can be sourced by <code>~/.zshrc</code></p>
+<p><strong><code>r-proj.zsh</code></strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode zsh code-with-copy"><code class="sourceCode zsh"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/zsh</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># A function to open R project in current directory</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">openrpg()</span><span class="kw">{</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">open</span> <span class="pp">*</span>.Rproj</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>And, make it executable by:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode zsh code-with-copy"><code class="sourceCode zsh"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x <span class="st">"r-proj.zsh"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="create-r-project" class="level1">
+<h1>Create R Project</h1>
+<p>Now, the last part is a little bit tricky!</p>
+<p>First, let’s me show the easy way to do in shell by executing R code directly.</p>
+<section id="using-radian-console" class="level2">
+<h2 class="anchored" data-anchor-id="using-radian-console">Using Radian Console</h2>
+<p>The <a href="https://github.com/randy3k/radian">radian</a> is a modern R console in the shell. First, enter R by running <code>radian</code>, then type any R code. The result looks pretty.</p>
+<p><img src="img/radian-iris.png" class="img-fluid"></p>
+<p>To create a new project, you can use <a href="https://usethis.r-lib.org/reference/create_package.html"><code>usethis::create_project("path-to-project")</code></a></p>
+<p><img src="img/radian-create-proj.png" class="img-fluid"></p>
+<p>It’s done!, however, there is quite a bit of typing.</p>
+<p>Next, I’ll show you to all of this <em>plus</em> open an R project being created all in one line of code with fewer characters.</p>
+</section>
+<section id="create-r-project-directly-from-shell" class="level2">
+<h2 class="anchored" data-anchor-id="create-r-project-directly-from-shell">Create R Project directly from Shell</h2>
+<section id="the-goal" class="level3">
+<h3 class="anchored" data-anchor-id="the-goal">The Goal</h3>
+<p><strong>What I want to achieve is this…</strong></p>
+<p>If I run this command in shell,</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode zsh code-with-copy"><code class="sourceCode zsh"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">newrpj</span> <span class="st">"foo"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>the R project “foo” should be created, then in my terminal it should <code>cd</code> to <code>foo/</code> directory, and open <code>foo.Rproj</code> file in RStudio.</p>
+<p>We’ll need to do a couple of things:</p>
+<ol type="1">
+<li>Execute that R script from Shell, and also passing R project name as shell argument.</li>
+<li>Put all necessary R functions in an R script. I’ll call it <code>new-rpj.R</code></li>
+<li>Wrap all shell commands into one shell function</li>
+</ol>
+</section>
+<section id="execute-r-script-from-shell" class="level3">
+<h3 class="anchored" data-anchor-id="execute-r-script-from-shell">Execute R Script from Shell</h3>
+<p><a href="https://bash-intro.rsquaredacademy.com/r-command-line.html">Command Line Basics for R Users</a> show that <code>Rscript</code> command is the way to execute R script from shell.</p>
+<p>The basic usage is quite simple.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode zsh code-with-copy"><code class="sourceCode zsh"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="st">"/Users/kittipos/bin-ks/helper/R/new-rpg.R"</span> <span class="st">"foo"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This will execute <code>new-rpj.R</code>, and “foo” is a shell argument to be passed to the script.</p>
+</section>
+<section id="write-r-script" class="level3">
+<h3 class="anchored" data-anchor-id="write-r-script">Write R Script</h3>
+<p>Now, let’s edit <code>new-rpj.R</code></p>
+<p><strong>new-rpj.R</strong></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrieve Shell arguments</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>arg <span class="ot">&lt;-</span> <span class="fu">commandArgs</span>(<span class="at">trailingOnly =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span>]</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Show what parameter is being recieved</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"- Passing zsh parameter:"</span>, arg)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create R Project using name we've supply</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_project</span>(arg, <span class="at">rstudio =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol type="1">
+<li><p><code>commandArgs()</code> is a function to retrieve shell arguments, <code>trailingOnly = TRUE</code> will only get the one that we’ve supply, for more example <a href="https://www.r-bloggers.com/2015/02/bashr-howto-pass-parameters-from-bash-script-to-r/">see r-bloggers post</a>.</p></li>
+<li><p>Assign the first shell argument to <code>arg</code></p></li>
+<li><p><code>cat()</code> to confirm the passing parameter.</p></li>
+<li><p>Lastly, <code>usethis::create_project()</code> to create an R project with name from <code>arg</code>. Use <code>rstudio = TRUE</code> to also create <code>.Rproj</code> file.</p></li>
+</ol>
+<p>After saving this script <code>new-rpg.R</code>, try running this in the shell:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode zsh code-with-copy"><code class="sourceCode zsh"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="st">"/Users/kittipos/bin-ks/helper/R/new-rpg.R"</span> <span class="st">"foo"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It should create R project “foo” as a sub-directory of your current working directory.</p>
+</section>
+<section id="wrap-up-everything" class="level3">
+<h3 class="anchored" data-anchor-id="wrap-up-everything">Wrap up everything</h3>
+<p>Finally, let’s wrap-up everything by building <code>newrpj</code> function to create R project, change directory to the project folder, and open the project in RStudio.</p>
+<p>I store this function in <code>r-proj.zsh</code> which can be sourced by <code>~/.zshrc</code>.</p>
+<p><strong><code>r-proj.zsh</code></strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode zsh code-with-copy"><code class="sourceCode zsh"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/zsh</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Function to create new R Project, `cd` to the project, and open in RStudio</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">newrpj()</span><span class="kw">{</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create R project in a sub-directory with names from shell 1st argument</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Rscript</span> <span class="st">"/Users/kittipos/bin-ks/helper/R/new-rpj.R"</span> <span class="st">"</span><span class="va">$1</span><span class="st">"</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Go into that sub-directory &amp; Open R project in RStudio</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">cd</span> <span class="st">"</span><span class="va">$1</span><span class="st">"</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">open</span> <span class="pp">*</span>.Rproj</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Notice <code>$1</code> which is a <a href="https://www.shellscript.sh/variables2.html">shell variable</a> that represents the first argument supplies to the <code>newrpj()</code> function, which, in this case, is an R project name.</li>
+</ul>
+<p>Here is the result of calling <code>newrpj</code> with argument “tester”</p>
+<ol type="1">
+<li><p>Created RStudio project named <strong>“tester”</strong></p></li>
+<li><p>Change working directory to <strong>tester</strong>, and</p></li>
+<li><p>Open RStudio</p></li>
+</ol>
+<p><img src="img/newrpj.png" class="img-fluid"></p>
+<p><img src="img/tester-rstudio.png" class="img-fluid"></p>
+
+
+</section>
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1" role="doc-endnote"><p>You can also define an <code>alias</code> instead of function, but I like to use function because It can handle larger code better. Also, another way is to assign path to a <code>$VARIABLE</code> and <code>cd $VARIABLE</code>, but you might have to type more characters.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    setTimeout(function() {
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+</body></html>

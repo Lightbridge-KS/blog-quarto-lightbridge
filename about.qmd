@@ -1,5 +1,6 @@
 ---
-title: "About"
+title: "Lightbridge"
+subtitle: "Kittipos Sirivongrungson"
 image: "images/profile.jpeg"
 about:
   id: hero-heading
@@ -16,7 +17,7 @@ about:
 
 ---
 
-## Welcome !
+# Welcome !
 
 :::{#hero-heading}
 

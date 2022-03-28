@@ -1,0 +1,32 @@
+---
+title: "build"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # Set WD to Root
+here::i_am("_dev/build.qmd")
+library(here)
+```
+
+## Helpers
+
+```{r new_post_subdir}
+new_post_subdir <- function(name, 
+                            dir = "posts", 
+                            prefix = paste0(Sys.Date(), "_")
+                            ) {
+  
+  dir_name <- paste0(prefix, name)
+  path <- fs::dir_create(here::here(dir, dir_name))
+  
+  cli::cli_inform("Create directory {.field {dir_name}} at {.file {path}}")
+  
+}
+```
+
+## Posts
+
+```{r}
+new_post_subdir()
+```
+
