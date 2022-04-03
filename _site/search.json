@@ -1,5 +1,26 @@
 [
   {
+    "objectID": "posts/2022-04-03_lm-penguins/index.html",
+    "href": "posts/2022-04-03_lm-penguins/index.html",
+    "title": "Linear Regression Models",
+    "section": "",
+    "text": "Code\nlibrary(tidyverse)\nlibrary(palmerpenguins)"
+  },
+  {
+    "objectID": "posts/2022-04-03_lm-penguins/index.html#explore-data",
+    "href": "posts/2022-04-03_lm-penguins/index.html#explore-data",
+    "title": "Linear Regression Models",
+    "section": "Explore Data",
+    "text": "Explore Data\n\n\nCode\nvisdat::vis_dat(penguins)\n\n\n\n\n\n\n\n\n\n\n\nCode\nhead(penguins)\n\n\n\n \n  \n    species \n    island \n    bill_length_mm \n    bill_depth_mm \n    flipper_length_mm \n    body_mass_g \n    sex \n    year \n  \n \n\n  \n    Adelie \n    Torgersen \n    39.1 \n    18.7 \n    181 \n    3750 \n    male \n    2007 \n  \n  \n    Adelie \n    Torgersen \n    39.5 \n    17.4 \n    186 \n    3800 \n    female \n    2007 \n  \n  \n    Adelie \n    Torgersen \n    40.3 \n    18.0 \n    195 \n    3250 \n    female \n    2007 \n  \n  \n    Adelie \n    Torgersen \n    NA \n    NA \n    NA \n    NA \n    NA \n    2007 \n  \n  \n    Adelie \n    Torgersen \n    36.7 \n    19.3 \n    193 \n    3450 \n    female \n    2007 \n  \n  \n    Adelie \n    Torgersen \n    39.3 \n    20.6 \n    190 \n    3650 \n    male \n    2007"
+  },
+  {
+    "objectID": "posts/2022-04-03_lm-penguins/index.html#simple-linear-regression-model",
+    "href": "posts/2022-04-03_lm-penguins/index.html#simple-linear-regression-model",
+    "title": "Linear Regression Models",
+    "section": "Simple Linear Regression Model",
+    "text": "Simple Linear Regression Model\nGoal: predict body_mass_g from bill_depth_mm\n\n\nCode\npen_lm_fit_simple <- lm(body_mass_g ~ bill_depth_mm, data = penguins)\nsummary(pen_lm_fit_simple)\n#> \n#> Call:\n#> lm(formula = body_mass_g ~ bill_depth_mm, data = penguins)\n#> \n#> Residuals:\n#>      Min       1Q   Median       3Q      Max \n#> -1607.38  -510.10   -66.96   462.43  1819.28 \n#> \n#> Coefficients:\n#>               Estimate Std. Error t value Pr(>|t|)    \n#> (Intercept)    7488.65     335.22   22.34   <2e-16 ***\n#> bill_depth_mm  -191.64      19.42   -9.87   <2e-16 ***\n#> ---\n#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n#> \n#> Residual standard error: 708.1 on 340 degrees of freedom\n#>   (2 observations deleted due to missingness)\n#> Multiple R-squared:  0.2227, Adjusted R-squared:  0.2204 \n#> F-statistic: 97.41 on 1 and 340 DF,  p-value: < 2.2e-16\n\n\n\n\nCode\nbroom::glance(pen_lm_fit_simple)\n\n\n\n \n  \n    r.squared \n    adj.r.squared \n    sigma \n    statistic \n    p.value \n    df \n    logLik \n    AIC \n    BIC \n    deviance \n    df.residual \n    nobs \n  \n \n\n  \n    0.2227044 \n    0.2204182 \n    708.0772 \n    97.414 \n    0 \n    1 \n    -2728.667 \n    5463.334 \n    5474.839 \n    170466918 \n    340 \n    342"
+  },
+  {
     "objectID": "posts/2022-03-17-shell-to-r-1/index.html",
     "href": "posts/2022-03-17-shell-to-r-1/index.html",
     "title": "Open and Create R project from Shell",
@@ -11,7 +32,7 @@
     "href": "posts/2022-03-17-shell-to-r-1/index.html#quick-navigation",
     "title": "Open and Create R project from Shell",
     "section": "Quick Navigation",
-    "text": "Quick Navigation\nHow to navigate to an R project quickly ? Lots of options can do it without using a mouse, e.g. using Spotlight Search in mac, but to day I’ll use command line.\nI like to group most of my R projects in a single directory (i.e. R_programming) so that I can navigate easily even with GUI. That will helpful when using CLI too.\nYou might already know cd command which change directory of a terminal, but typing cd multiple times can be time consuming.\n\nA simple solution is to creating a shell function to change directory to a parent folder which contains R projects.\n\n\n# Define a function to change directory\ncdrpg(){\n    cd \"/Users/kittipos/Desktop/R_Programming\"\n}\n\n# Call function to change directory to `R_Programming/`\ncdrpg\n\n# Print working directory\npwd\n\n/Users/kittipos/Desktop/R_Programming\n\n\nIn the code above.1\n\nI define a shell function cdrpg() that change directory to my R_programming folder\nI execute cdrpg, and the directory is then changed (to call function in shell, you don’t use parenthesis).\nCall pwd to confirm the location at R_Programming directory\n\nFor me, I store this function in a .zsh file that can be sourced by ~/.zshrc\ncd-to.zsh\n#!/bin/zsh\n\n# CD to R_Programming Folder\ncdrpg(){\n    cd \"/Users/kittipos/Desktop/R_Programming\"\n}\nAnd, make it executable by:\nchmod +x \"cd-to.zsh\"\nSo that every time I open shell, I could call cdrpg, and I would arriving at R_Programming directory.\nAnd I also define similar functions to cd to other frequently-visited locations in this cd-to.zsh script as well."
+    "text": "Quick Navigation\nHow to navigate to an R project quickly ? Lots of options can do it without using a mouse, e.g. using Spotlight Search in mac, but to day I’ll use command line.\nI like to group most of my R projects in a single directory (i.e. R_programming) so that I can navigate easily even with GUI. That will helpful when using CLI too.\nYou might already know cd command which change directory of a terminal, but typing cd multiple times can be time consuming.\n\nA simple solution is to creating a shell function to change directory to a parent folder which contains R projects.\n\n\n\nCode\n# Define a function to change directory\ncdrpg(){\n    cd \"/Users/kittipos/Desktop/R_Programming\"\n}\n\n# Call function to change directory to `R_Programming/`\ncdrpg\n\n# Print working directory\npwd\n\n\n/Users/kittipos/Desktop/R_Programming\n\n\nIn the code above.1\n\nI define a shell function cdrpg() that change directory to my R_programming folder\nI execute cdrpg, and the directory is then changed (to call function in shell, you don’t use parenthesis).\nCall pwd to confirm the location at R_Programming directory\n\nFor me, I store this function in a .zsh file that can be sourced by ~/.zshrc\ncd-to.zsh\n#!/bin/zsh\n\n# CD to R_Programming Folder\ncdrpg(){\n    cd \"/Users/kittipos/Desktop/R_Programming\"\n}\nAnd, make it executable by:\nchmod +x \"cd-to.zsh\"\nSo that every time I open shell, I could call cdrpg, and I would arriving at R_Programming directory.\nAnd I also define similar functions to cd to other frequently-visited locations in this cd-to.zsh script as well."
   },
   {
     "objectID": "posts/2022-03-17-shell-to-r-1/index.html#open-r-project",
@@ -39,7 +60,7 @@
     "href": "index.html",
     "title": "My Blog",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nShell\n\n\nFun-Idea\n\n\n\n\nA fun tutorial involving zsh & R code\n\n\n\n\n\n\nMar 17, 2022\n\n\nKittipos Sirivongrungson\n\n\n\n\n\n\nNo matching items"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nR\n\n\nStats\n\n\n\n\nBuiding linear models with palmerpenguins\n\n\n\n\n\n\nApr 3, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nShell\n\n\nFun-Idea\n\n\n\n\nA fun tutorial involving zsh & R code\n\n\n\n\n\n\nMar 17, 2022\n\n\nKittipos Sirivongrungson\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",

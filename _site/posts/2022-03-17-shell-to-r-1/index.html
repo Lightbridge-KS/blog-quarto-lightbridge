@@ -172,7 +172,10 @@
 <p>In the next demonstraction, I’ll walk you through by creating a <strong>shell function</strong> which you have to store it in <code>~/.bashrc</code> or <code>~/.zshrc</code> (or other locations that can be sourced) by yourself.</p>
 <p>Before I started, I using macOs, and my shell is <strong>zsh</strong> running in a Terminal app. If you are using different shell, modify the code correspondingly.</p>
 <div class="cell">
+<details open="">
+<summary>Code</summary>
 <div class="sourceCode" id="cb1"><pre class="sourceCode zsh cell-code code-with-copy"><code class="sourceCode zsh"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">$SHELL</span> <span class="at">--version</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-stdout">
 <pre><code>zsh 5.8 (x86_64-apple-darwin21.0)</code></pre>
 </div>
@@ -188,6 +191,8 @@
 <p>A simple solution is to creating a <strong>shell function</strong> to change directory to a parent folder which contains R projects.</p>
 </blockquote>
 <div class="cell">
+<details open="">
+<summary>Code</summary>
 <div class="sourceCode" id="cb3"><pre class="sourceCode zsh cell-code code-with-copy"><code class="sourceCode zsh"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function to change directory</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cdrpg()</span><span class="kw">{</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">cd</span> <span class="st">"/Users/kittipos/Desktop/R_Programming"</span></span>
@@ -198,6 +203,7 @@
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Print working directory</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">pwd</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-stdout">
 <pre><code>/Users/kittipos/Desktop/R_Programming</code></pre>
 </div>

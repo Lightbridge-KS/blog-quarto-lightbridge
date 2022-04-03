@@ -27,6 +27,6 @@ new_post_subdir <- function(name,
 ## Posts
 
 ```{r}
-new_post_subdir()
+new_post_subdir("lm-penguins")
 ```
 

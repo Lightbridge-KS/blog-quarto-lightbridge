@@ -1,0 +1,61 @@
+---
+title: "Linear Regression Models"
+description: "Buiding linear models with palmerpenguins"
+date: "2022-04-03"
+draft: false # Will render locally only
+categories: ["R", "Stats"]
+#image: feature.jpg
+---
+
+```{r setup, include=FALSE}
+library(here)
+here::i_am("posts/2022-04-03_lm-penguins/index.qmd")
+source(here::here("posts/_common.R"))
+```
+
+```{r setup-pkg}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+## Explore Data
+
+
+```{r}
+visdat::vis_dat(penguins)
+```
+
+
+```{r}
+head(penguins)
+```
+
+
+
+
+```{r include=FALSE}
+penguins %>%
+  select(species, body_mass_g, ends_with("_mm")) %>%
+  GGally::ggpairs(aes(color = species))
+```
+
+
+## Simple Linear Regression Model
+
+**Goal:** predict `body_mass_g` from `bill_depth_mm`
+
+```{r lm_fit_simple}
+pen_lm_fit_simple <- lm(body_mass_g ~ bill_depth_mm, data = penguins)
+summary(pen_lm_fit_simple)
+```
+
+```{r}
+broom::glance(pen_lm_fit_simple)
+```
+
+
+```{r include=FALSE}
+#pen_lm_fit_simple_gl <- broom::glance(pen_lm_fit_simple)
+```
+
+
