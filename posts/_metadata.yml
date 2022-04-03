@@ -6,3 +6,11 @@ freeze: true
 
 # Enable banner style title blocks
 title-block-banner: true
+# User can fold code
+code-fold: show
+
+# My Inform
+author: "Kittipos Sirivongrungson"
+
+#project:
+  #pre-render: "_common.R"
