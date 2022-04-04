@@ -1,61 +1,268 @@
 ---
 title: "Linear Regression Models"
-description: "Buiding linear models with palmerpenguins"
+description: "Linear models with palmerpenguins"
 date: "2022-04-03"
 draft: false # Will render locally only
-categories: ["R", "Stats"]
-#image: feature.jpg
+categories: ["R", "Stats", "Penguins"]
+image: feature.png
+bibliography: packages.bib
 ---
 
 ```{r setup, include=FALSE}
 library(here)
 here::i_am("posts/2022-04-03_lm-penguins/index.qmd")
 source(here::here("posts/_common.R"))
+
+knitr::write_bib(c("palmerpenguins"), "packages.bib")
 ```
+
+Let's explore linear regression models. The data I will be using is `penguins` dataset from [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/index.html) package [@R-palmerpenguins].
 
 ```{r setup-pkg}
 library(tidyverse)
 library(palmerpenguins)
 ```
 
-## Explore Data
+# Explore Data
 
+Let's see an overview of the data by visualizing the column names, types, and missing values.
 
 ```{r}
 visdat::vis_dat(penguins)
 ```
 
+Here is the first few rows of the data.
 
 ```{r}
 head(penguins)
 ```
 
+For quick overview `GGally::ggpairs()` can show relationship among penguin `species` and other numeric variables.
 
-
-
-```{r include=FALSE}
+```{r ggpairs, cache=TRUE}
 penguins %>%
   select(species, body_mass_g, ends_with("_mm")) %>%
-  GGally::ggpairs(aes(color = species))
+  GGally::ggpairs(aes(color = species)) +
+  
+  scale_fill_brewer(palette = "Set2") +
+  scale_color_brewer(palette = "Set2")
 ```
 
+Today, I will focus on predicting **`body_mass_g`** of the penguins using linear regression models.
 
-## Simple Linear Regression Model
+# Simple Linear Regression Model
 
-**Goal:** predict `body_mass_g` from `bill_depth_mm`
+::: callout-tip
+## Goal
+
+Predict `body_mass_g` using 1 predictor `bill_depth_mm`.
+:::
+
+let's fit the simple linear regression model. The outcome variable is `body_mass_g` and the predictor is `bill_depth_mm`.
+
+## Plotting
+
+Now, Let's visualize a scatter plot between these 2 variables.
+
+```{r fig-plot-lm}
+#| fig-cap: Points represent each observations. Blue line is a simple linear regression fitted to the data.
+p1 <- penguins %>% 
+  ggplot(aes(bill_depth_mm, body_mass_g)) +
+  geom_point(color = "cyan4", alpha = 0.7) +
+  geom_smooth(method = "lm") +
+  labs(title = "Simple Linear Regression")
+
+p1
+```
+
+@fig-plot-lm show relationships between `body_mass_g` and `bill_depth_mm`. Looking at these points, I can see 2 clouds of points: the upper-left group and the lower-right group.
+
+By looking at the line, something strange is happening here, the line connects 2 clouds of points together with *downward* sloping; an increase in `bill_depth_mm` corresponding to a decrease of `body_mass_g` !
+
+It's a little weird right ?
+
+I will explore this further, but for now let's assume that it is OK and continue to fit the model.
+
+## Fitting Model
+
+I will use `lm()` function to fit the model, then the model's summary will be shown by `summary()`.
 
 ```{r lm_fit_simple}
 pen_lm_fit_simple <- lm(body_mass_g ~ bill_depth_mm, data = penguins)
 summary(pen_lm_fit_simple)
 ```
 
+`broom::glance()` will return model's summary in a one-row tibble which can be easier to manipulate it later.
+
 ```{r}
 broom::glance(pen_lm_fit_simple)
 ```
 
-
 ```{r include=FALSE}
-#pen_lm_fit_simple_gl <- broom::glance(pen_lm_fit_simple)
+pen_lm_fit_simple_gl <- broom::glance(pen_lm_fit_simple)
+pen_lm_fit_simple_adj.rsq <- round(pen_lm_fit_simple_gl$adj.r.squared, 2)
 ```
 
+## Summary
 
+::: callout-tip
+## Model Summary
+
+The linear regression model of `body_mass_g` on `bill_depth_mm` has an adjusted R^2^ = `r pen_lm_fit_simple_adj.rsq`, p-value \< 0.001; meaning that this model is statistically significant and `r pen_lm_fit_simple_adj.rsq * 100`% of variation in `body_mass_g` can be explained by `bill_depth_mm`.
+:::
+
+**Automated Report**
+
+```{r results='asis'}
+#| code-fold: true
+report::report(pen_lm_fit_simple)  %>% summary() 
+```
+
+## Coefficient
+
+```{r include=FALSE}
+pen_lm_fit_simple_cof_bd <- round(coef(pen_lm_fit_simple)[["bill_depth_mm"]], 1)
+```
+
+The estimated model coefficients can be written as @eq-pen-sim.
+
+$$
+\widehat{Wt} = 7488.7 - 191.6 \times Bill.Depth
+$$ {#eq-pen-sim}
+
+::: callout-tip
+## Coefficient Interpretation
+
+Every 1 mm increases in bill depth corresponds to an *estimated* decreases of weight by `r pen_lm_fit_simple_cof_bd` kg.
+:::
+
+------------------------------------------------------------------------
+
+# Multiple Linear Regression
+
+Now, let's add `species` to our linear model.
+
+::: callout-tip
+## Goal
+
+Predict `body_mass_g` using 2 predictors: `bill_depth_mm` and `species`.
+:::
+
+## Plotting
+
+Let's make a scatter plot similar to @fig-plot-lm with colors added to `species`.
+
+```{r fig-plot-lm2}
+#| label: fig-plot-lm2
+#| fig-cap: 3 linear regressions by each `species`
+p2 <- penguins %>% 
+  ggplot(aes(bill_depth_mm, body_mass_g, color = species, shape = species)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  scale_color_brewer(palette = "Set2") +
+  labs(title = "Multiple Linear Regression")
+
+p2
+```
+
+```{r include=FALSE}
+# ggsave("feature.png", p2, dpi = "retina")
+```
+
+In @fig-plot-lm2, with `color = species` added to the plot, we can see that the upper-left cloud of points are **Gentoo** species and the lower-right are **Adelie** and **Chinstrap**. The interesting thing here is the 3 regression lines that fitted to each species has an *upward* slope which is contrast to the @fig-plot-lm.
+
+::: callout-note
+## Compare Plots
+
+You can see the plots of simple vs multiple linear regression side-by-side here.
+:::
+
+```{r p1-p2, echo=FALSE}
+#| column: screen-inset-shaded
+#| layout-nrow: 1
+p1
+p2
+```
+
+## Fitting Model
+
+Next, The model will be fitted once again with an outcome variable: `body_mass_g` , and predictors: `bill_depth_mm` and `species`. I will use `broom::tidy()` to show model coefficients.
+
+```{r pen_lm_fit_multi}
+pen_lm_fit_multi <- lm(body_mass_g ~ bill_depth_mm + species, data = penguins)
+
+broom::tidy(pen_lm_fit_multi)
+```
+
+```{r include=FALSE}
+pen_lm_fit_multi_tidy <- broom::tidy(pen_lm_fit_multi)
+```
+
+`broom::glance()` shows model overview as one-row data frame.
+
+```{r}
+broom::glance(pen_lm_fit_multi)
+```
+
+```{r include=FALSE}
+pen_lm_fit_multi_gl <- broom::glance(pen_lm_fit_multi)
+pen_lm_fit_multi_adj.rsq <- round(pen_lm_fit_multi_gl$adj.r.squared, 2)
+```
+
+## Summary
+
+::: callout-tip
+## Model Summary
+
+The linear regression model of `body_mass_g` on `bill_depth_mm` and `species` has an adjusted R^2^ = `r pen_lm_fit_multi_adj.rsq`, p-value \< 0.001; meaning that this model is statistically significant and `r pen_lm_fit_simple_adj.rsq * 100`% of variation in `body_mass_g` can be explained by `bill_depth_mm` and `species`.
+:::
+
+**Automated Report**
+
+```{r results='asis'}
+#| code-fold: true
+report::report(pen_lm_fit_multi)  %>% summary() 
+```
+
+## Coefficient
+
+The estimated model coefficients can be written as @eq-pen-multi1.
+
+$$
+\begin{aligned}
+\widehat{Wt} = &- 1007.3 \\
+               &+ 256.6 \times Bill.Depth \\
+               &+ 13.4 \times SP_{Chinstrap} \\
+               &+ 2238.7 \times SP_{Gentoo}
+\end{aligned}
+$$ {#eq-pen-multi1}
+
+I use the notation $Var_{LV}$ to represent **indicator variables** for when the categorical variable takes a particular value. For example $SP_{Chinstrap}$ would take a value of 1 if the `species` is "Chinstrap", and it would take a value of 0 otherwise. The same logic also applies to "Gentoo".
+
+We have seen from the @fig-plot-lm2 that the models can be visualized as 3 regression lines for each species. Now we shall see whether coefficient of the model agree with the plot.
+
+```{r pen_lm_fit_multi_coef, include=FALSE}
+pen_lm_fit_multi_coef <- round(coef(pen_lm_fit_multi), 1)
+```
+
+### Slope
+
+The slope of the line is the coefficient of $Bill.Depth$ as given by @eq-pen-multi1, It means that **the slope of each 3 lines is the same** (= `r pen_lm_fit_multi_coef[["bill_depth_mm"]]`).
+
+::: callout-tip
+## Slope Interpretation
+
+For every 1 mm increases in `bill_depth_mm` in any given `species` corresponds to an *estimated* increases in `body_mass_g` of `r pen_lm_fit_multi_coef[["bill_depth_mm"]]`.
+:::
+
+::: callout-caution
+## Important
+
+In this multiple regression example, It can be seen that the coefficient of `bill_depth_mm` after **adjusting for `species`** (`r pen_lm_fit_multi_coef[["bill_depth_mm"]]`) is **not** the same as before when it is the only predictor (`r pen_lm_fit_simple_cof_bd`).
+:::
+
+### Distances between Lines
+
+We can estimate differences in `body_mass_g` among `species` when taking `bill_depth_mm` into account using @eq-pen-multi1. The **"Adelie"** species is considered as baseline.
+
+For example, using $SP_{Gentoo}$ coefficient, we could say that **"Gentoo"** has an estimated weight of `r pen_lm_fit_multi_coef[["speciesGentoo"]]` (g) more than **"Adelie"** for any given `bill_depth_mm`. Note that the effect of **"Chinstrap"** is non-significant as we can already see in the @fig-plot-lm2 that Chinstrap's line and Adelie's line are, in fact, very close.
