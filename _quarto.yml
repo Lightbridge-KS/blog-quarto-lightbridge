@@ -13,6 +13,9 @@ format:
   html:
     theme: Flatly
     css: styles.css
+    html-math-method: mathjax # mathjax (default), katex, mathml
 
 
+csl: "_assets/csl/elsevier-with-titles.csl"
 
+#"_assets/csl/american-statistical-association.csl"
