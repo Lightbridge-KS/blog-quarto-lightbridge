@@ -8,6 +8,12 @@ freeze: true
 title-block-banner: true
 # User can fold code
 code-fold: show
+toc: true
+toc-depth: 2
+
+# format:
+#   html:
+#   bibliography:
 
 # My Inform
 author: "Kittipos Sirivongrungson"
