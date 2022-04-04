@@ -58,3 +58,14 @@ registerS3method(
   "knit_print", "data.frame", knit_print.data.frame,
   envir = asNamespace("knitr")
 )
+
+
+
+# Plot Setting ------------------------------------------------------------
+
+if (knitr::is_html_output()) {
+  ggplot2::theme_set(ggplot2::theme_minimal(base_size = 12))
+} else if (knitr::is_latex_output()) {
+  ggplot2::theme_set(ggplot2::theme_minimal(base_size = 11))
+}
+
