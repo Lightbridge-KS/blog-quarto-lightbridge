@@ -14,6 +14,9 @@ about:
     - icon: github
       text: Github
       href: "https://github.com/Lightbridge-KS"
+    - icon: website
+      text: Website
+      href: "https://lightbridge.netlify.app"
 
 ---
 
