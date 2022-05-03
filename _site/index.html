@@ -64,9 +64,9 @@ ul.task-list{list-style: none;}
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-author','listing-subtitle','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description","listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -134,7 +134,7 @@ ul.task-list{list-style: none;}
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Fun-Idea">Fun-Idea <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Penguins">Penguins <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Shell">Shell <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Stats">Stats <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Calculator">Calculator <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Fun-Idea">Fun-Idea <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Med">Med <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Penguins">Penguins <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Shell">Shell <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Stats">Stats <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -172,7 +172,45 @@ ul.task-list{list-style: none;}
     </div>
 </div>
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="R,Stats,Penguins" data-listing-date-sort="1648918800000" data-listing-file-modified-sort="1649084873691" data-listing-reading-time-sort="4.855">
+<div class="quarto-post image-right" data-index="0" data-categories="R,Med,Calculator" data-listing-date-sort="1651510800000" data-listing-file-modified-sort="1651600373221" data-listing-reading-time-sort="7.055">
+<div class="thumbnail">
+<p><a href="./posts/2022-05-03_med-calc-timi/index.html"> <img src="./posts/2022-05-03_med-calc-timi/feature.jpg" class="thumnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="./posts/2022-05-03_med-calc-timi/index.html">
+<h3 class="no-anchor listing-title">
+TIMI Risk Score for STEMI
+</h3>
+<div class="listing-subtitle">
+A Simple Calculator
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
+R
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Med'); return false;">
+Med
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Calculator'); return false;">
+Calculator
+</div>
+</div>
+<a href="./posts/2022-05-03_med-calc-timi/index.html">
+<div class="listing-description">
+<p>How to program a simple TIMI risk score calculator for STEMI</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="./posts/2022-05-03_med-calc-timi/index.html">
+<div class="listing-date">
+May 3, 2022
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="R,Stats,Penguins" data-listing-date-sort="1648918800000" data-listing-file-modified-sort="1649084873691" data-listing-reading-time-sort="4.855">
 <div class="thumbnail">
 <p><a href="./posts/2022-04-03_lm-penguins/index.html"> <img src="./posts/2022-04-03_lm-penguins/feature.png" class="thumnail-image"> </a></p>
 </div>
@@ -210,7 +248,7 @@ Apr 3, 2022
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="R,Shell,Fun-Idea" data-listing-date-sort="1647450000000" data-listing-file-modified-sort="1648472921149" data-listing-reading-time-sort="5.1">
+<div class="quarto-post image-right" data-index="2" data-categories="R,Shell,Fun-Idea" data-listing-date-sort="1647450000000" data-listing-file-modified-sort="1648472921149" data-listing-reading-time-sort="5.1">
 <div class="thumbnail">
 <p><a href="./posts/2022-03-17-shell-to-r-1/index.html"> <img src="./posts/2022-03-17-shell-to-r-1/feature.jpg" class="thumnail-image"> </a></p>
 </div>

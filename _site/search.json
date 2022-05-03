@@ -102,7 +102,7 @@
     "href": "index.html",
     "title": "My Blog",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nStats\n\n\nPenguins\n\n\n\n\nLinear models with palmerpenguins\n\n\n\n\n\n\nApr 3, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nShell\n\n\nFun-Idea\n\n\n\n\nA fun tutorial involving zsh & R code\n\n\n\n\n\n\nMar 17, 2022\n\n\nKittipos Sirivongrungson\n\n\n\n\n\n\nNo matching items"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n  \n\n\n\n\n\nA Simple Calculator\n\n\n\n\nR\n\n\nMed\n\n\nCalculator\n\n\n\n\nHow to program a simple TIMI risk score calculator for STEMI\n\n\n\n\n\n\nMay 3, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nStats\n\n\nPenguins\n\n\n\n\nLinear models with palmerpenguins\n\n\n\n\n\n\nApr 3, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nShell\n\n\nFun-Idea\n\n\n\n\nA fun tutorial involving zsh & R code\n\n\n\n\n\n\nMar 17, 2022\n\n\nKittipos Sirivongrungson\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -117,5 +117,33 @@
     "title": "License",
     "section": "",
     "text": "© 2022 Lightbridge"
+  },
+  {
+    "objectID": "posts/2022-05-03_med-calc-timi/index.html",
+    "href": "posts/2022-05-03_med-calc-timi/index.html",
+    "title": "TIMI Risk Score for STEMI",
+    "section": "",
+    "text": "Today, I build a simple program to calculate TIMI Risk Score for STEMI [1] using R code.\nThe calculator will simply base on this table chart."
+  },
+  {
+    "objectID": "posts/2022-05-03_med-calc-timi/index.html#main-function-timi_calc",
+    "href": "posts/2022-05-03_med-calc-timi/index.html#main-function-timi_calc",
+    "title": "TIMI Risk Score for STEMI",
+    "section": "Main Function: TIMI_calc()",
+    "text": "Main Function: TIMI_calc()\nFunction’s Parameter\nHistorical\n\nage: (int) Age in years\nDM: (lgl) Any DM ?\nHTN: (lgl) Any HTN ?\nangina: (lgl) Any angina ?\n\nExam\n\nSBP: (dbl) Systolic Blood Pressure (mmHg)\nHR: (dbl) Heart Rate (bpm)\nKillip: (lgl) Killip Class form 1 - 4\nwt: (dbl) Weight in kg\n\nPresentation\n\nAnt_STE: (lgl) Anterior STE ?\nLBBB: (lgl) LBBB ?\ntime_to_rx: (dbl) time to treatment (hr)\n\nReturn value: A data frame with 3 columns:\n\nrisk.score: TIMI risk score\nodds.death.30d: estimated odds of death by 30 day.\np.death.30d: estimated probability of death by 30 day."
+  },
+  {
+    "objectID": "posts/2022-05-03_med-calc-timi/index.html#helper-function",
+    "href": "posts/2022-05-03_med-calc-timi/index.html#helper-function",
+    "title": "TIMI Risk Score for STEMI",
+    "section": "Helper Function",
+    "text": "Helper Function\nSince the original table reports as odds not a probability of death by 30 day. We need to write a function to convert odds to probability.\nOdds of death is a ratio of the probability of death to the probability of survival; we can write the Equation 1 (\\(p\\) denotes the probability of death).\n\\[\nodd = \\frac{p}{1-p}\n\\qquad(1)\\]\nRearranging terms \\(p\\) to the left, we get:\n\\[\np = \\frac{odd}{odd + 1}\n\\]\nTherefore we can write function odds_to_prob().\n\n\nCode\nodds_to_prob <- function(odds) odds / (odds + 1)"
+  },
+  {
+    "objectID": "posts/2022-05-03_med-calc-timi/index.html#lookup-table",
+    "href": "posts/2022-05-03_med-calc-timi/index.html#lookup-table",
+    "title": "TIMI Risk Score for STEMI",
+    "section": "Lookup Table",
+    "text": "Lookup Table\nrisk_df is a lookup table that maps risk score to the odds and probability of death.\n\n\nCode\nrisk_df <- tibble::tibble(\n  risk.score = 0:8,\n  odds.death.30d = c(0.1, 0.3, 0.4, 0.7, 1.2, 2.2, 3, 4.8, 5.8)\n  ) %>% \n  # Test Convert Odds to Probability\n  mutate(p.death.30d = odds_to_prob(odds.death.30d))\n\nrisk_df\n\n\n\n \n  \n    risk.score \n    odds.death.30d \n    p.death.30d \n  \n \n\n  \n    0 \n    0.1 \n    0.0909091 \n  \n  \n    1 \n    0.3 \n    0.2307692 \n  \n  \n    2 \n    0.4 \n    0.2857143 \n  \n  \n    3 \n    0.7 \n    0.4117647 \n  \n  \n    4 \n    1.2 \n    0.5454545 \n  \n  \n    5 \n    2.2 \n    0.6875000 \n  \n  \n    6 \n    3.0 \n    0.7500000 \n  \n  \n    7 \n    4.8 \n    0.8275862 \n  \n  \n    8 \n    5.8 \n    0.8529412 \n  \n\n\n\n\nKeep in mind that if risk score is > 8, the odds of death by 30 day would be 8.8 but this would be impossible to include in the data frame."
   }
 ]

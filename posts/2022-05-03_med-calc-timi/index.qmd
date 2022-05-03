@@ -1,0 +1,276 @@
+---
+title: "TIMI Risk Score for STEMI"
+subtitle: "A Simple Calculator"
+description: "How to program a simple TIMI risk score calculator for STEMI"
+date: "2022-05-03"
+draft: false # Will render locally only
+categories: ["R", "Med", "Calculator"]
+tags: 
+  - "DIY"
+image: feature.jpg
+bibliography: "references.bib"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # Set WD to Root
+here::i_am("posts/2022-05-03_med-calc-timi/index.qmd")
+library(here)
+source(here("posts/_common.R"))
+```
+
+Today, I build a simple program to calculate TIMI Risk Score for STEMI [@Morrow2000-us] using R code.
+
+The calculator will simply base on this table chart.
+
+![](img/TIMI-card.png){#fig-card fig-alt="TIMI-card"}
+
+```{r setup-pkg, message=FALSE, warning=FALSE}
+library(dplyr)
+library(stringr)
+```
+
+# Design
+
+Design motivation came from a TIMI Risk Score for STEMI from [mdcalc](https://www.mdcalc.com/timi-risk-score-stemi#creator-insights).
+
+## Main Function: `TIMI_calc()`
+
+Function's Parameter
+
+Historical
+
+-   `age`: (int) Age in years
+-   `DM`: (lgl) Any DM ?
+-   `HTN`: (lgl) Any HTN ?
+-   `angina`: (lgl) Any angina ?
+
+Exam
+
+-   `SBP`: (dbl) Systolic Blood Pressure (mmHg)
+-   `HR`: (dbl) Heart Rate (bpm)
+-   `Killip`: (lgl) Killip Class form 1 - 4
+-   `wt`: (dbl) Weight in kg
+
+Presentation
+
+-   `Ant_STE`: (lgl) Anterior STE ?
+-   `LBBB`: (lgl) LBBB ?
+-   `time_to_rx`: (dbl) time to treatment (hr)
+
+Return value: A data frame with 3 columns:
+
+-   `risk.score`: TIMI risk score
+-   `odds.death.30d`: estimated odds of death by 30 day.
+-   `p.death.30d`: estimated probability of death by 30 day.
+
+## Helper Function
+
+Since the original table reports as *odds* not a probability of death by 30 day. We need to write a function to convert odds to probability.
+
+Odds of death is a ratio of the probability of death to the probability of survival; we can write the @eq-odds ($p$ denotes the probability of death).
+
+$$
+odd = \frac{p}{1-p}
+$$ {#eq-odds}
+
+Rearranging terms $p$ to the left, we get:
+
+$$
+p = \frac{odd}{odd + 1}
+$$
+
+Therefore we can write function `odds_to_prob()`.
+
+```{r odds_to_prob}
+odds_to_prob <- function(odds) odds / (odds + 1)
+```
+
+## Lookup Table
+
+`risk_df` is a lookup table that maps risk score to the odds and probability of death.
+
+```{r risk_df}
+risk_df <- tibble::tibble(
+  risk.score = 0:8,
+  odds.death.30d = c(0.1, 0.3, 0.4, 0.7, 1.2, 2.2, 3, 4.8, 5.8)
+  ) %>% 
+  # Test Convert Odds to Probability
+  mutate(p.death.30d = odds_to_prob(odds.death.30d))
+
+risk_df
+```
+
+Keep in mind that if risk score is \> 8, the odds of death by 30 day would be 8.8 but this would be impossible to include in the data frame.
+
+# Function: `get_TIMI_score()`
+
+First, let's start building `get_TIMI_score()` to calculate TIMI risk score.
+
+The return value will be a list with:
+
+-   `total_score`: (int) a total risk score (range 0-14)
+-   `score`: a list containing individual score for each fields.
+
+Note that I use `ifelse()` because it vectorized over the inputs.
+
+```{r get_TIMI_score}
+get_TIMI_score <- function(age, DM, HTN, angina,
+                           SBP, HR, Killip, wt,
+                           Ant_STE, LBBB, time_to_rx
+                           ) {
+  
+  score <- list() # Initialize empty list to store score
+  
+  # Age ≥ 75 = 3 score, Age 65-75 = 2 score
+  score$age <- ifelse(age >= 75, 3L, ifelse(age >= 65, 2L, 0L))
+  # Any DM, HT, or angina give 1 score
+  score$DM_HT_angina <- ifelse(DM | HTN | angina, 1L, 0L)
+  # SBP < 100 give 3 score
+  score$SBP <- ifelse(SBP < 100, 3L, 0L)
+  # HR > 100 give 2 score
+  score$HR <- ifelse(HR > 100, 2L, 0L)
+  # Killip II-IV give 2 score
+  score$Killip <- ifelse(Killip %in% 2L:4L, 2L, 0L)
+  # Weight < 67 kg give 1 score
+  score$wt <- ifelse(wt < 67, 1L, 0L)
+  # Anterior STE or LBBB give 1 score
+  score$Ant_STE_LBBB <- ifelse(Ant_STE | LBBB, 1L, 0L)
+  # Time of rx > 4 hr give 1 score
+  score$time_to_rx <- ifelse(time_to_rx > 4, 1L, 0L)
+  ## Sum Scores
+  total_score <- as.integer(colSums(t(as.data.frame(score))))
+  
+  list(total_score = total_score, 
+       score = score)
+}
+```
+
+Test getting TIMI score from input of 1 patient
+
+```{r patient1}
+patient1_score <- get_TIMI_score(
+  age = 60, DM = TRUE, HTN = FALSE, angina = TRUE,
+  SBP = 110, HR = 90, Killip = 1, wt = 60,
+  Ant_STE = TRUE, LBBB = FALSE, time_to_rx = 3
+)
+```
+
+```{r}
+# Total Score
+patient1_score$total_score
+# Individual Score
+patient1_score$score
+```
+
+# Function: `TIMI_calc()`
+
+Now the final function `TIMI_calc()` will calculate TIMI risk score, odds and probability of death by 30 days.
+
+The return value will be a data frame.
+
+```{r TIMI_calc}
+TIMI_calc <- function(age, DM, HTN, angina,
+                      SBP, HR, Killip, wt,
+                      Ant_STE, LBBB, time_to_rx
+                      ) {
+
+  score <- get_TIMI_score(age = age, DM = DM, HTN = HTN,
+                 angina = angina, SBP = SBP,
+                 HR = HR, Killip = Killip,
+                 wt = wt, Ant_STE = Ant_STE,
+                 LBBB = LBBB, time_to_rx = time_to_rx)
+  
+  total_score <- score$total_score
+  
+  # If the risk score > 8, odds is 8.8. If not, find odds from `risk_df`
+  odds.death.30d <- ifelse(total_score > 8, 8.8, {
+    
+    # Odds from Lookup Table
+    risk_df[total_score + 1, ]$odds.death.30d
+    
+  })
+  # Combind to Data Frame
+  data.frame(
+    risk.score = total_score,
+    odds.death.30d = odds.death.30d,
+    p.death.30d = odds_to_prob(odds.death.30d)
+  )
+  
+}
+```
+
+Let's try `TIMI_calc()`, I have designed it to be a vectorized function.
+
+Therefore, we can input arguments as vector of length \> 1.
+
+```{r}
+TIMI_calc(age = 60:61, 
+          DM = c(T, F), 
+          HTN = c(F, T), 
+          angina = c(T, F),
+          SBP = c(110, 130), 
+          HR = c(90, 100), 
+          Killip = 1:2, 
+          wt = 60:61,
+          Ant_STE = c(T, F), 
+          LBBB = c(T, F), 
+          time_to_rx = c(3,4)
+          ) 
+```
+
+# Example Useage
+
+Let's say I have a `patients` data frame, which contains a collection of history, physical exams, and other presentation from 3 patients.
+
+```{r patients, include=FALSE}
+patients <- data.frame(
+  name = c("John", "Dave", "Marty"),
+  age = c(50, 70, 80),
+  underlying = c("None", "DM", "DM, HT"),
+  angina = c(T, F, T),
+  SBP = c(120, 100, 90),
+  HR = c(70, 80, 100),
+  Killip = c(0, 1, 2),
+  wt = c(70, 80, 65),
+  EKG = c("Anterior STE", "Inferior STE", "Inferior STE, LBBB"),
+  time_to_rx = c(2, 3, 4)
+)
+```
+
+```{r}
+patients
+```
+
+Next, I will use `TIMI_calc()` on these data. But first, I will use some trick to convert `patients` into a cleaner data frame `patients_args` that can be passed as arguments directly.
+
+```{r patients_prep}
+patients_args <- patients %>% 
+  # Extract DM, HT to logical 
+  mutate(
+    DM = str_detect(underlying, "DM"), 
+    HTN = str_detect(underlying, "HTN"), .after = underlying
+    ) %>% 
+  # Extract Ant_STE, LBBB to logical
+  mutate(
+    Ant_STE = str_detect(EKG, "Anterior STE"),
+    LBBB = str_detect(EKG, "LBBB"), .after = EKG
+  ) %>% 
+  select(-name, -underlying, -EKG)
+```
+
+Now I use non-standard evaluation trick from `{rlang}` to unquote splice `patients_args` and passed as argument.
+
+```{r}
+patients_res <- rlang::exec(TIMI_calc, !!!patients_args)
+patients_res
+```
+
+Finally, I will bind the result into one data frame to keep track of other patient's information.
+
+```{r}
+patients %>% 
+  bind_cols(patients_res) %>% 
+  relocate(risk.score, odds.death.30d, p.death.30d, .after = name)
+```
+
+That's all !

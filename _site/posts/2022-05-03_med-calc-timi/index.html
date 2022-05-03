@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-0.9.256">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Kittipos Sirivongrungson">
+<meta name="dcterms.date" content="2022-05-03">
+<meta name="description" content="How to program a simple TIMI risk score calculator for STEMI">
+
+<title>Lightbridge - TIMI Risk Score for STEMI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link id="quarto-text-highlighting-styles" href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Lightbridge</span>
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">About</a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Lightbridge-KS"><i class="bi bi-github" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">TIMI Risk Score for STEMI</h1>
+            <p class="subtitle lead">A Simple Calculator</p>
+                          <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">Med</div>
+                <div class="quarto-category">Calculator</div>
+              </div>
+                  </div>
+  </div>
+    
+  <div>
+    <div class="description">
+      How to program a simple TIMI risk score calculator for STEMI
+    </div>
+  </div>
+
+
+
+
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Kittipos Sirivongrungson </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">2022-05-03</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#design" id="toc-design" class="nav-link active" data-scroll-target="#design">Design</a>
+  <ul class="collapse">
+  <li><a href="#main-function-timi_calc" id="toc-main-function-timi_calc" class="nav-link" data-scroll-target="#main-function-timi_calc">Main Function: <code>TIMI_calc()</code></a></li>
+  <li><a href="#helper-function" id="toc-helper-function" class="nav-link" data-scroll-target="#helper-function">Helper Function</a></li>
+  <li><a href="#lookup-table" id="toc-lookup-table" class="nav-link" data-scroll-target="#lookup-table">Lookup Table</a></li>
+  </ul></li>
+  <li><a href="#function-get_timi_score" id="toc-function-get_timi_score" class="nav-link" data-scroll-target="#function-get_timi_score">Function: <code>get_TIMI_score()</code></a></li>
+  <li><a href="#function-timi_calc" id="toc-function-timi_calc" class="nav-link" data-scroll-target="#function-timi_calc">Function: <code>TIMI_calc()</code></a></li>
+  <li><a href="#example-useage" id="toc-example-useage" class="nav-link" data-scroll-target="#example-useage">Example Useage</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>Today, I build a simple program to calculate TIMI Risk Score for STEMI <span class="citation" data-cites="Morrow2000-us">[<a href="#ref-Morrow2000-us" role="doc-biblioref">1</a>]</span> using R code.</p>
+<p>The calculator will simply base on this table chart.</p>
+<p><img src="img/TIMI-card.png" id="fig-card" class="img-fluid" alt="TIMI-card"></p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="design" class="level1">
+<h1>Design</h1>
+<p>Design motivation came from a TIMI Risk Score for STEMI from <a href="https://www.mdcalc.com/timi-risk-score-stemi#creator-insights">mdcalc</a>.</p>
+<section id="main-function-timi_calc" class="level2">
+<h2 class="anchored" data-anchor-id="main-function-timi_calc">Main Function: <code>TIMI_calc()</code></h2>
+<p>Function’s Parameter</p>
+<p>Historical</p>
+<ul>
+<li><code>age</code>: (int) Age in years</li>
+<li><code>DM</code>: (lgl) Any DM ?</li>
+<li><code>HTN</code>: (lgl) Any HTN ?</li>
+<li><code>angina</code>: (lgl) Any angina ?</li>
+</ul>
+<p>Exam</p>
+<ul>
+<li><code>SBP</code>: (dbl) Systolic Blood Pressure (mmHg)</li>
+<li><code>HR</code>: (dbl) Heart Rate (bpm)</li>
+<li><code>Killip</code>: (lgl) Killip Class form 1 - 4</li>
+<li><code>wt</code>: (dbl) Weight in kg</li>
+</ul>
+<p>Presentation</p>
+<ul>
+<li><code>Ant_STE</code>: (lgl) Anterior STE ?</li>
+<li><code>LBBB</code>: (lgl) LBBB ?</li>
+<li><code>time_to_rx</code>: (dbl) time to treatment (hr)</li>
+</ul>
+<p>Return value: A data frame with 3 columns:</p>
+<ul>
+<li><code>risk.score</code>: TIMI risk score</li>
+<li><code>odds.death.30d</code>: estimated odds of death by 30 day.</li>
+<li><code>p.death.30d</code>: estimated probability of death by 30 day.</li>
+</ul>
+</section>
+<section id="helper-function" class="level2">
+<h2 class="anchored" data-anchor-id="helper-function">Helper Function</h2>
+<p>Since the original table reports as <em>odds</em> not a probability of death by 30 day. We need to write a function to convert odds to probability.</p>
+<p>Odds of death is a ratio of the probability of death to the probability of survival; we can write the <a href="#eq-odds">Equation&nbsp;1</a> (<span class="math inline">\(p\)</span> denotes the probability of death).</p>
+<p><span id="eq-odds"><span class="math display">\[
+odd = \frac{p}{1-p}
+\qquad(1)\]</span></span></p>
+<p>Rearranging terms <span class="math inline">\(p\)</span> to the left, we get:</p>
+<p><span class="math display">\[
+p = \frac{odd}{odd + 1}
+\]</span></p>
+<p>Therefore we can write function <code>odds_to_prob()</code>.</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>odds_to_prob <span class="ot">&lt;-</span> <span class="cf">function</span>(odds) odds <span class="sc">/</span> (odds <span class="sc">+</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="lookup-table" class="level2">
+<h2 class="anchored" data-anchor-id="lookup-table">Lookup Table</h2>
+<p><code>risk_df</code> is a lookup table that maps risk score to the odds and probability of death.</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>risk_df <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">risk.score =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">8</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds.death.30d =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">0.7</span>, <span class="fl">1.2</span>, <span class="fl">2.2</span>, <span class="dv">3</span>, <span class="fl">4.8</span>, <span class="fl">5.8</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Test Convert Odds to Probability</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p.death.30d =</span> <span class="fu">odds_to_prob</span>(odds.death<span class="fl">.30</span>d))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>risk_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:right;"> risk.score </th>
+   <th style="text-align:right;"> odds.death.30d </th>
+   <th style="text-align:right;"> p.death.30d </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.1 </td>
+   <td style="text-align:right;"> 0.0909091 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.3 </td>
+   <td style="text-align:right;"> 0.2307692 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 0.4 </td>
+   <td style="text-align:right;"> 0.2857143 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 0.7 </td>
+   <td style="text-align:right;"> 0.4117647 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 1.2 </td>
+   <td style="text-align:right;"> 0.5454545 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:right;"> 2.2 </td>
+   <td style="text-align:right;"> 0.6875000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 3.0 </td>
+   <td style="text-align:right;"> 0.7500000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 7 </td>
+   <td style="text-align:right;"> 4.8 </td>
+   <td style="text-align:right;"> 0.8275862 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 8 </td>
+   <td style="text-align:right;"> 5.8 </td>
+   <td style="text-align:right;"> 0.8529412 </td>
+  </tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Keep in mind that if risk score is &gt; 8, the odds of death by 30 day would be 8.8 but this would be impossible to include in the data frame.</p>
+</section>
+</section>
+<section id="function-get_timi_score" class="level1">
+<h1>Function: <code>get_TIMI_score()</code></h1>
+<p>First, let’s start building <code>get_TIMI_score()</code> to calculate TIMI risk score.</p>
+<p>The return value will be a list with:</p>
+<ul>
+<li><code>total_score</code>: (int) a total risk score (range 0-14)</li>
+<li><code>score</code>: a list containing individual score for each fields.</li>
+</ul>
+<p>Note that I use <code>ifelse()</code> because it vectorized over the inputs.</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>get_TIMI_score <span class="ot">&lt;-</span> <span class="cf">function</span>(age, DM, HTN, angina,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                           SBP, HR, Killip, wt,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                           Ant_STE, LBBB, time_to_rx</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                           ) {</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  score <span class="ot">&lt;-</span> <span class="fu">list</span>() <span class="co"># Initialize empty list to store score</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Age ≥ 75 = 3 score, Age 65-75 = 2 score</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  score<span class="sc">$</span>age <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">75</span>, 3L, <span class="fu">ifelse</span>(age <span class="sc">&gt;=</span> <span class="dv">65</span>, 2L, 0L))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Any DM, HT, or angina give 1 score</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  score<span class="sc">$</span>DM_HT_angina <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(DM <span class="sc">|</span> HTN <span class="sc">|</span> angina, 1L, 0L)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># SBP &lt; 100 give 3 score</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  score<span class="sc">$</span>SBP <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(SBP <span class="sc">&lt;</span> <span class="dv">100</span>, 3L, 0L)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># HR &gt; 100 give 2 score</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  score<span class="sc">$</span>HR <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(HR <span class="sc">&gt;</span> <span class="dv">100</span>, 2L, 0L)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Killip II-IV give 2 score</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  score<span class="sc">$</span>Killip <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(Killip <span class="sc">%in%</span> 2L<span class="sc">:</span>4L, 2L, 0L)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Weight &lt; 67 kg give 1 score</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  score<span class="sc">$</span>wt <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(wt <span class="sc">&lt;</span> <span class="dv">67</span>, 1L, 0L)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Anterior STE or LBBB give 1 score</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  score<span class="sc">$</span>Ant_STE_LBBB <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(Ant_STE <span class="sc">|</span> LBBB, 1L, 0L)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Time of rx &gt; 4 hr give 1 score</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  score<span class="sc">$</span>time_to_rx <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(time_to_rx <span class="sc">&gt;</span> <span class="dv">4</span>, 1L, 0L)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Sum Scores</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  total_score <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">colSums</span>(<span class="fu">t</span>(<span class="fu">as.data.frame</span>(score))))</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">total_score =</span> total_score, </span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">score =</span> score)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Test getting TIMI score from input of 1 patient</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>patient1_score <span class="ot">&lt;-</span> <span class="fu">get_TIMI_score</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">age =</span> <span class="dv">60</span>, <span class="at">DM =</span> <span class="cn">TRUE</span>, <span class="at">HTN =</span> <span class="cn">FALSE</span>, <span class="at">angina =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">SBP =</span> <span class="dv">110</span>, <span class="at">HR =</span> <span class="dv">90</span>, <span class="at">Killip =</span> <span class="dv">1</span>, <span class="at">wt =</span> <span class="dv">60</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ant_STE =</span> <span class="cn">TRUE</span>, <span class="at">LBBB =</span> <span class="cn">FALSE</span>, <span class="at">time_to_rx =</span> <span class="dv">3</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Total Score</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>patient1_score<span class="sc">$</span>total_score</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Individual Score</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>patient1_score<span class="sc">$</span>score</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $age</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $DM_HT_angina</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $SBP</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $HR</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $Killip</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $wt</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $Ant_STE_LBBB</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $time_to_rx</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="function-timi_calc" class="level1">
+<h1>Function: <code>TIMI_calc()</code></h1>
+<p>Now the final function <code>TIMI_calc()</code> will calculate TIMI risk score, odds and probability of death by 30 days.</p>
+<p>The return value will be a data frame.</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>TIMI_calc <span class="ot">&lt;-</span> <span class="cf">function</span>(age, DM, HTN, angina,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                      SBP, HR, Killip, wt,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                      Ant_STE, LBBB, time_to_rx</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                      ) {</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  score <span class="ot">&lt;-</span> <span class="fu">get_TIMI_score</span>(<span class="at">age =</span> age, <span class="at">DM =</span> DM, <span class="at">HTN =</span> HTN,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">angina =</span> angina, <span class="at">SBP =</span> SBP,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">HR =</span> HR, <span class="at">Killip =</span> Killip,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">wt =</span> wt, <span class="at">Ant_STE =</span> Ant_STE,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">LBBB =</span> LBBB, <span class="at">time_to_rx =</span> time_to_rx)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  total_score <span class="ot">&lt;-</span> score<span class="sc">$</span>total_score</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If the risk score &gt; 8, odds is 8.8. If not, find odds from `risk_df`</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  odds.death<span class="fl">.30</span>d <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(total_score <span class="sc">&gt;</span> <span class="dv">8</span>, <span class="fl">8.8</span>, {</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Odds from Lookup Table</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    risk_df[total_score <span class="sc">+</span> <span class="dv">1</span>, ]<span class="sc">$</span>odds.death<span class="fl">.30</span>d</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Combind to Data Frame</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">risk.score =</span> total_score,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">odds.death.30d =</span> odds.death<span class="fl">.30</span>d,</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">p.death.30d =</span> <span class="fu">odds_to_prob</span>(odds.death<span class="fl">.30</span>d)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Let’s try <code>TIMI_calc()</code>, I have designed it to be a vectorized function.</p>
+<p>Therefore, we can input arguments as vector of length &gt; 1.</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">TIMI_calc</span>(<span class="at">age =</span> <span class="dv">60</span><span class="sc">:</span><span class="dv">61</span>, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">DM =</span> <span class="fu">c</span>(T, F), </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">HTN =</span> <span class="fu">c</span>(F, T), </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">angina =</span> <span class="fu">c</span>(T, F),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">SBP =</span> <span class="fu">c</span>(<span class="dv">110</span>, <span class="dv">130</span>), </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">HR =</span> <span class="fu">c</span>(<span class="dv">90</span>, <span class="dv">100</span>), </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">Killip =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">wt =</span> <span class="dv">60</span><span class="sc">:</span><span class="dv">61</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">Ant_STE =</span> <span class="fu">c</span>(T, F), </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">LBBB =</span> <span class="fu">c</span>(T, F), </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">time_to_rx =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">4</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>          ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:right;"> risk.score </th>
+   <th style="text-align:right;"> odds.death.30d </th>
+   <th style="text-align:right;"> p.death.30d </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 0.7 </td>
+   <td style="text-align:right;"> 0.4117647 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 1.2 </td>
+   <td style="text-align:right;"> 0.5454545 </td>
+  </tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="example-useage" class="level1">
+<h1>Example Useage</h1>
+<p>Let’s say I have a <code>patients</code> data frame, which contains a collection of history, physical exams, and other presentation from 3 patients.</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>patients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> name </th>
+   <th style="text-align:right;"> age </th>
+   <th style="text-align:left;"> underlying </th>
+   <th style="text-align:left;"> angina </th>
+   <th style="text-align:right;"> SBP </th>
+   <th style="text-align:right;"> HR </th>
+   <th style="text-align:right;"> Killip </th>
+   <th style="text-align:right;"> wt </th>
+   <th style="text-align:left;"> EKG </th>
+   <th style="text-align:right;"> time_to_rx </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> John </td>
+   <td style="text-align:right;"> 50 </td>
+   <td style="text-align:left;"> None </td>
+   <td style="text-align:left;"> TRUE </td>
+   <td style="text-align:right;"> 120 </td>
+   <td style="text-align:right;"> 70 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 70 </td>
+   <td style="text-align:left;"> Anterior STE </td>
+   <td style="text-align:right;"> 2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Dave </td>
+   <td style="text-align:right;"> 70 </td>
+   <td style="text-align:left;"> DM </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:right;"> 100 </td>
+   <td style="text-align:right;"> 80 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 80 </td>
+   <td style="text-align:left;"> Inferior STE </td>
+   <td style="text-align:right;"> 3 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Marty </td>
+   <td style="text-align:right;"> 80 </td>
+   <td style="text-align:left;"> DM, HT </td>
+   <td style="text-align:left;"> TRUE </td>
+   <td style="text-align:right;"> 90 </td>
+   <td style="text-align:right;"> 100 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 65 </td>
+   <td style="text-align:left;"> Inferior STE, LBBB </td>
+   <td style="text-align:right;"> 4 </td>
+  </tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Next, I will use <code>TIMI_calc()</code> on these data. But first, I will use some trick to convert <code>patients</code> into a cleaner data frame <code>patients_args</code> that can be passed as arguments directly.</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>patients_args <span class="ot">&lt;-</span> patients <span class="sc">%&gt;%</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract DM, HT to logical </span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">DM =</span> <span class="fu">str_detect</span>(underlying, <span class="st">"DM"</span>), </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">HTN =</span> <span class="fu">str_detect</span>(underlying, <span class="st">"HTN"</span>), <span class="at">.after =</span> underlying</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract Ant_STE, LBBB to logical</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Ant_STE =</span> <span class="fu">str_detect</span>(EKG, <span class="st">"Anterior STE"</span>),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">LBBB =</span> <span class="fu">str_detect</span>(EKG, <span class="st">"LBBB"</span>), <span class="at">.after =</span> EKG</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>name, <span class="sc">-</span>underlying, <span class="sc">-</span>EKG)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Now I use non-standard evaluation trick from <code>{rlang}</code> to unquote splice <code>patients_args</code> and passed as argument.</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>patients_res <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">exec</span>(TIMI_calc, <span class="sc">!!!</span>patients_args)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>patients_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:right;"> risk.score </th>
+   <th style="text-align:right;"> odds.death.30d </th>
+   <th style="text-align:right;"> p.death.30d </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 0.4 </td>
+   <td style="text-align:right;"> 0.2857143 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 0.7 </td>
+   <td style="text-align:right;"> 0.4117647 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 8.8 </td>
+   <td style="text-align:right;"> 0.8979592 </td>
+  </tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Finally, I will bind the result into one data frame to keep track of other patient’s information.</p>
+<div class="cell" data-layout-align="center">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>patients <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(patients_res) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(risk.score, odds.death<span class="fl">.30</span>d, p.death<span class="fl">.30</span>d, <span class="at">.after =</span> name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> name </th>
+   <th style="text-align:right;"> risk.score </th>
+   <th style="text-align:right;"> odds.death.30d </th>
+   <th style="text-align:right;"> p.death.30d </th>
+   <th style="text-align:right;"> age </th>
+   <th style="text-align:left;"> underlying </th>
+   <th style="text-align:left;"> angina </th>
+   <th style="text-align:right;"> SBP </th>
+   <th style="text-align:right;"> HR </th>
+   <th style="text-align:right;"> Killip </th>
+   <th style="text-align:right;"> wt </th>
+   <th style="text-align:left;"> EKG </th>
+   <th style="text-align:right;"> time_to_rx </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> John </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 0.4 </td>
+   <td style="text-align:right;"> 0.2857143 </td>
+   <td style="text-align:right;"> 50 </td>
+   <td style="text-align:left;"> None </td>
+   <td style="text-align:left;"> TRUE </td>
+   <td style="text-align:right;"> 120 </td>
+   <td style="text-align:right;"> 70 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 70 </td>
+   <td style="text-align:left;"> Anterior STE </td>
+   <td style="text-align:right;"> 2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Dave </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 0.7 </td>
+   <td style="text-align:right;"> 0.4117647 </td>
+   <td style="text-align:right;"> 70 </td>
+   <td style="text-align:left;"> DM </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:right;"> 100 </td>
+   <td style="text-align:right;"> 80 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 80 </td>
+   <td style="text-align:left;"> Inferior STE </td>
+   <td style="text-align:right;"> 3 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Marty </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 8.8 </td>
+   <td style="text-align:right;"> 0.8979592 </td>
+   <td style="text-align:right;"> 80 </td>
+   <td style="text-align:left;"> DM, HT </td>
+   <td style="text-align:left;"> TRUE </td>
+   <td style="text-align:right;"> 90 </td>
+   <td style="text-align:right;"> 100 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 65 </td>
+   <td style="text-align:left;"> Inferior STE, LBBB </td>
+   <td style="text-align:right;"> 4 </td>
+  </tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>That’s all !</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body" role="doc-bibliography">
+<div id="ref-Morrow2000-us" class="csl-entry" role="doc-biblioentry">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">D.A. Morrow, E.M. Antman, A. Charlesworth, R. Cairns, S.A. Murphy, J.A. de Lemos, R.P. Giugliano, C.H. McCabe, E. Braunwald, <span>TIMI</span> risk score for <span class="nocase">ST-elevation</span> myocardial infarction: A convenient, bedside, clinical score for risk assessment at presentation: An intravenous <span class="nocase">nPA</span> for treatment of infarcting myocardium early <span>II</span> trial substudy, Circulation. 102 (2000) 2031–2037.</div>
+</div>
+</div></section></div></main> <!-- /main -->
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    setTimeout(function() {
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">
+        <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Lightbridge-KS">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+      </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="../../license.html">License</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>
