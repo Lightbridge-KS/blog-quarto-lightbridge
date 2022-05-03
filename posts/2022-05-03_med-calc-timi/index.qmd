@@ -102,7 +102,7 @@ risk_df
 
 Keep in mind that if risk score is \> 8, the odds of death by 30 day would be 8.8 but this would be impossible to include in the data frame.
 
-# Function: `get_TIMI_score()`
+# Get Score
 
 First, let's start building `get_TIMI_score()` to calculate TIMI risk score.
 
@@ -162,7 +162,7 @@ patient1_score$total_score
 patient1_score$score
 ```
 
-# Function: `TIMI_calc()`
+# Calculate Odds and Probability
 
 Now the final function `TIMI_calc()` will calculate TIMI risk score, odds and probability of death by 30 days.
 
@@ -218,9 +218,9 @@ TIMI_calc(age = 60:61,
           ) 
 ```
 
-# Example Useage
+# Example Usage
 
-Let's say I have a `patients` data frame, which contains a collection of history, physical exams, and other presentation from 3 patients.
+Let's say I have a `patients` data frame (simulated), which contains a collection of history, physical exams, and other presentation from, keeping it simple, 3 patients.
 
 ```{r patients, include=FALSE}
 patients <- data.frame(
@@ -272,5 +272,7 @@ patients %>%
   bind_cols(patients_res) %>% 
   relocate(risk.score, odds.death.30d, p.death.30d, .after = name)
 ```
+
+I hope this example could give you an idea to design and program your own calculator to solve problems that you're facing someday.
 
 That's all !

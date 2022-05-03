@@ -227,9 +227,9 @@ div.csl-indent {
   <li><a href="#helper-function" id="toc-helper-function" class="nav-link" data-scroll-target="#helper-function">Helper Function</a></li>
   <li><a href="#lookup-table" id="toc-lookup-table" class="nav-link" data-scroll-target="#lookup-table">Lookup Table</a></li>
   </ul></li>
-  <li><a href="#function-get_timi_score" id="toc-function-get_timi_score" class="nav-link" data-scroll-target="#function-get_timi_score">Function: <code>get_TIMI_score()</code></a></li>
-  <li><a href="#function-timi_calc" id="toc-function-timi_calc" class="nav-link" data-scroll-target="#function-timi_calc">Function: <code>TIMI_calc()</code></a></li>
-  <li><a href="#example-useage" id="toc-example-useage" class="nav-link" data-scroll-target="#example-useage">Example Useage</a></li>
+  <li><a href="#get-score" id="toc-get-score" class="nav-link" data-scroll-target="#get-score">Get Score</a></li>
+  <li><a href="#calculate-odds-and-probability" id="toc-calculate-odds-and-probability" class="nav-link" data-scroll-target="#calculate-odds-and-probability">Calculate Odds and Probability</a></li>
+  <li><a href="#example-usage" id="toc-example-usage" class="nav-link" data-scroll-target="#example-usage">Example Usage</a></li>
   </ul>
 </nav>
     </div>
@@ -378,8 +378,8 @@ p = \frac{odd}{odd + 1}
 <p>Keep in mind that if risk score is &gt; 8, the odds of death by 30 day would be 8.8 but this would be impossible to include in the data frame.</p>
 </section>
 </section>
-<section id="function-get_timi_score" class="level1">
-<h1>Function: <code>get_TIMI_score()</code></h1>
+<section id="get-score" class="level1">
+<h1>Get Score</h1>
 <p>First, let’s start building <code>get_TIMI_score()</code> to calculate TIMI risk score.</p>
 <p>The return value will be a list with:</p>
 <ul>
@@ -466,8 +466,8 @@ p = \frac{odd}{odd + 1}
 </details>
 </div>
 </section>
-<section id="function-timi_calc" class="level1">
-<h1>Function: <code>TIMI_calc()</code></h1>
+<section id="calculate-odds-and-probability" class="level1">
+<h1>Calculate Odds and Probability</h1>
 <p>Now the final function <code>TIMI_calc()</code> will calculate TIMI risk score, odds and probability of death by 30 days.</p>
 <p>The return value will be a data frame.</p>
 <div class="cell" data-layout-align="center">
@@ -546,9 +546,9 @@ p = \frac{odd}{odd + 1}
 </div>
 </div>
 </section>
-<section id="example-useage" class="level1">
-<h1>Example Useage</h1>
-<p>Let’s say I have a <code>patients</code> data frame, which contains a collection of history, physical exams, and other presentation from 3 patients.</p>
+<section id="example-usage" class="level1">
+<h1>Example Usage</h1>
+<p>Let’s say I have a <code>patients</code> data frame (simulated), which contains a collection of history, physical exams, and other presentation from, keeping it simple, 3 patients.</p>
 <div class="cell" data-layout-align="center">
 <details open="">
 <summary>Code</summary>
@@ -742,6 +742,7 @@ p = \frac{odd}{odd + 1}
 </table>
 </div>
 </div>
+<p>I hope this example could give you an idea to design and program your own calculator to solve problems that you’re facing someday.</p>
 <p>That’s all !</p>
 
 
