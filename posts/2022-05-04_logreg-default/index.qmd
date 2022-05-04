@@ -13,7 +13,7 @@ execute:
   cache: true
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, cache=FALSE}
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # Set WD to Root
 here::i_am("posts/2022-05-04_logreg-default/index.qmd")
 library(here)
@@ -28,7 +28,7 @@ The goal is to build logistic regression model to predict `default` status.
 
 # Explore Data
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, cache=FALSE}
 library(tidyverse)
 library(ISLR)
 theme_set(theme_bw())
