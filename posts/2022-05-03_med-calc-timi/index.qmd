@@ -25,8 +25,8 @@ The calculator will simply base on this table chart.
 ![](img/TIMI-card.png){#fig-card fig-alt="TIMI-card"}
 
 ```{r setup-pkg, message=FALSE, warning=FALSE}
-library(dplyr)
-library(stringr)
+library(tidyverse)
+theme_set(theme_bw())
 ```
 
 # Design
@@ -99,6 +99,20 @@ risk_df <- tibble::tibble(
 
 risk_df
 ```
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| message: false
+risk_df %>% 
+  ggplot(aes(risk.score, p.death.30d, color = risk.score)) +
+  geom_point(alpha = 0.8, size = 3, show.legend = F) +
+  geom_smooth(se = FALSE, size = 0.5, lty = "dashed", show.legend = F) +
+  scale_color_viridis_c(option = "plasma", 
+                        begin = 0.1,end = 0.8) +
+  labs(x = "TIMI risk score", y = "Probability of death (30d)")
+```
+
 
 Keep in mind that if risk score is \> 8, the odds of death by 30 day would be 8.8 but this would be impossible to include in the data frame.
 

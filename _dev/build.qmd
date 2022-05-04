@@ -28,5 +28,7 @@ new_post_subdir <- function(name,
 
 ```{r}
 new_post_subdir("lm-penguins")
+
+new_post_subdir("med-calc-timi")
 ```
 
