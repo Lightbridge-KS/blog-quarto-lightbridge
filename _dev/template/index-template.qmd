@@ -1,0 +1,23 @@
+---
+title: "Post Titile"
+subtitle: "Post SubTitile"
+description: "Description"
+date: "$date$"
+draft: true # Will render locally only
+categories: ["cat1", "cat2"]
+tags: 
+  - "tag1"
+image: feature.jpg
+bibliography: "packages.bib"
+execute: 
+  cache: true
+---
+
+
+```{r setup, include=FALSE}
+library(here)
+here::i_am("$here_path$")
+source(here::here("posts/_common.R"))
+
+# knitr::write_bib(c("pkg"), "packages.bib")
+```

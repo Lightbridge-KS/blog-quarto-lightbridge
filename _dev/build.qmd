@@ -6,23 +6,9 @@ title: "build"
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # Set WD to Root
 here::i_am("_dev/build.qmd")
 library(here)
+source(here("R/new-post.R"))
 ```
 
-## Helpers
-
-```{r new_post_subdir}
-new_post_subdir <- function(name, 
-                            dir = "posts", 
-                            prefix = paste0(Sys.Date(), "_")
-                            ) {
-  
-  dir_name <- paste0(prefix, name)
-  path <- fs::dir_create(here::here(dir, dir_name))
-  
-  cli::cli_inform("Create directory {.field {dir_name}} at {.file {path}}")
-  
-}
-```
 
 ## Posts
 
@@ -34,6 +20,13 @@ new_post_subdir("med-calc-timi")
 # Default Logistic Regression
 new_post_subdir("logreg-default")
 ```
+
+Example to create new post
+
+```{r}
+# new_post("tester")
+```
+
 
 
 
