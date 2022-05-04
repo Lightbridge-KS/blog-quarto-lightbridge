@@ -242,7 +242,7 @@ div.csl-indent {
   <li><a href="#fit-to-training-data" id="toc-fit-to-training-data" class="nav-link" data-scroll-target="#fit-to-training-data">Fit to Training data</a></li>
   <li><a href="#use-testing-data-to-predict" id="toc-use-testing-data-to-predict" class="nav-link" data-scroll-target="#use-testing-data-to-predict">Use Testing data to Predict</a></li>
   </ul></li>
-  <li><a href="#summary-plot" id="toc-summary-plot" class="nav-link" data-scroll-target="#summary-plot">Summary Plot</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   </ul>
 </nav>
     </div>
@@ -996,19 +996,11 @@ Residual Deviance: 1139     AIC: 1145</code></pre>
 <p><img src="index_files/figure-html/p2-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell" data-hash="index_cache/html/unnamed-chunk-16_5bbbdf736866f87c3884a993dc2f214a">
-<details open="">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot2::ggsave(here("posts/2022-05-04_logreg-default/feature.png"), </span></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="co">#                 dpi = "retina", width = 25.6, height = 16, </span></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                 scale = 1, units = "cm")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 <p>This plot show estimated probability of <code>default</code> if we know the values of predictors: <code>student</code> and <code>balance</code> by using logistic regression model fitted on training data. The prediction was made by plugging test data to the model.</p>
 </section>
 </section>
-<section id="summary-plot" class="level1 page-columns page-full">
-<h1>Summary Plot</h1>
+<section id="summary" class="level1 page-columns page-full">
+<h1>Summary</h1>
 <div class="cell column-screen-inset-shaded quarto-layout-panel" data-hash="index_cache/html/p1-p2_59bfd1312ad8ffc09661e9408106de1f">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
@@ -1019,7 +1011,19 @@ Residual Deviance: 1139     AIC: 1145</code></pre>
 </div>
 </div>
 </div>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Summary Plots
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>The left-sided plot showed default status by balance and student status as observed in the <code>Default</code> data set. After multivariate logistic regression model (<code>default</code> on <code>balance</code> and <code>student</code>) was fitted to the training data, the predicted probability of default using the model was shown in the right-sided plot.</p>
+</div>
+</div>
 
 
 
