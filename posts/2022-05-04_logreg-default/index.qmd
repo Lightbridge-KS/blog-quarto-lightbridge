@@ -1,0 +1,371 @@
+---
+title: "Predicting Credit Card Default Status"
+subtitle: "A Logistic Regression Model using R."
+description: "Playing with logistic regression model with `Default` dataset"
+date: "2022-05-04"
+draft: false # Will render locally only
+categories: ["R", "Stats", "ML"]
+tags: 
+  - "logreg"
+image: feature.jpg
+bibliography: "packages.bib"
+execute: 
+  cache: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # Set WD to Root
+here::i_am("posts/2022-05-04_logreg-default/index.qmd")
+library(here)
+source(here::here("posts/_common.R"))
+
+knitr::write_bib(c("ISLR"), "packages.bib")
+```
+
+My motivation and code I used in here is an adaptation from Dr.Julia Silage's blog [bird-baths](https://juliasilge.com/blog/bird-baths/). I've applied the similar modeling process to `Default` dataset from `{ISLR}` package [@R-ISLR].
+
+The goal is to build logistic regression model to predict `default` status.
+
+# Explore Data
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ISLR)
+theme_set(theme_bw())
+```
+
+Let's take a look at the `Default` data set. It has 2 numeric variables: `balance` and `income`; and 2 factor variables: `default` and `student`
+
+```{r}
+summary(Default)
+```
+
+Detailed summary can be done with `skimr::skim()`
+
+```{r}
+skimr::skim(Default)
+```
+
+Please note that there are no missing values, which is great!
+
+::: callout-tip
+### Goal
+
+**The goal** here is to build a logistic regression model to predict `default`.
+:::
+
+## Plot Relationship
+
+I will explore the relationship between `default` and other variables (`income`, `balace`, `student`). Let's make some plots!
+
+```{r}
+Default %>% 
+  ggplot(aes(balance, income, color = default)) + 
+  geom_point(alpha = 0.4) +
+  scale_color_brewer(palette = "Set1", direction = -1) +
+  labs(title = "Default status by income and balance") 
+```
+
+By visual inspection, `balance` looks like a better predictor for `default` than `income`.
+
+```{r p1}
+p1 <- Default %>% 
+  ggplot(aes(balance, default, fill = student)) +
+  geom_boxplot(alpha = 0.8) +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(title = "Distribution of default",
+       subtitle = "by balance and student status",
+       caption = "Data from ISLR package") 
+  
+p1 
+```
+
+This plot shows that `balance` and `student` seem to be a decent predictor of `default`.
+
+# Simple Model
+
+::: callout-note
+
+**Goal:** Outcome variable = `default` (factor)
+
+:::
+
+First, I will use `glm()` function to build logistic regression model using all predictors.
+
+```{r glm_fit_simple}
+glm_fit_all <- glm(default ~ ., data = Default, family = binomial)
+summary(glm_fit_all)
+```
+
+```{r p.value_income, include=FALSE}
+p.value_income <- broom::tidy(glm_fit_all)$p.value[4]
+```
+
+Coefficient of `income` is not significant (p = `r p.value_income`). Let's try remove `income` out.
+
+```{r}
+glm_fit_st_bal <- glm(default ~ student + balance, 
+    data = Default, 
+    family = binomial)
+glm_fit_st_bal
+```
+
+Model that include only `student` and `balance` has **lower** estimation of test error (i.e., AIC & BIC).
+
+```{r}
+list("All Predictors" = glm_fit_all,
+     "student + balance" = glm_fit_st_bal) %>% 
+  map_dfr( 
+    broom::glance, 
+    .id = "Model") %>% 
+  select(Model, AIC, BIC)
+```
+
+# Modeling Process
+
+Now, let's apply full modeling process with `tidymodels`.
+
+```{r, message=FALSE, warning=FALSE}
+library(tidymodels)
+```
+
+## Split Data
+
+First, we need to spending data budgets in 2 portions: *training* and *testing* data.
+
+```{r Default_split}
+set.seed(123)
+# Split to Test and Train
+Default_split <- initial_split(Default, strata = default)
+
+Default_train <- training(Default_split) # 75% to traning data
+Default_test <- testing(Default_split) # 25% to test data
+
+Default_split
+```
+
+## Resampling Method
+
+I will use **10-Fold Cross-Validation** to resample the training data.
+
+```{r Default_folds}
+set.seed(234)
+
+Default_folds <- vfold_cv(Default_train, v = 10, strata = default)
+Default_folds 
+```
+
+Note that I use `strata = default` because the frequency of each class is quite difference.
+
+```{r}
+Default %>% count(default)
+```
+
+For each folds, 6750 rows will spend on fitting models and 750 spend on analysis of model performance:
+
+```{r}
+Default_folds$splits[[1]] 
+```
+
+## Specification
+
+### Model Specification
+
+```{r glm_spec}
+glm_spec <- logistic_reg()
+glm_spec
+```
+
+### Feature Engineering Specification
+
+```{r rec_basic}
+rec_basic <- recipe(default ~ ., data = Default) %>% 
+  step_dummy(all_nominal_predictors())
+
+summary(rec_basic)
+```
+
+**Preview of engineered training data**
+
+You can see that `student` was replaced by `student_Yes` with 0-1 encoding. What does it mean?
+
+```{r}
+rec_basic %>% 
+  prep(log_change = T) %>% 
+  bake(new_data = Default_train)
+```
+
+From `contrast()` function we can see the dummy encoding of the `student` (factor) variable: No = 0, Yes = 1.
+
+```{r}
+contrasts(Default$student)
+```
+
+### Workflow
+
+`workflow()` will bundle blueprint of feature engineering and model specification together.
+
+```{r wf_basic}
+wf_basic <- workflow(rec_basic, glm_spec)
+wf_basic
+```
+
+## Fit Model to Resampled Data
+
+```{r rs_basic}
+doParallel::registerDoParallel()
+
+ctrl_preds <- control_resamples(save_pred = TRUE)
+## Fit
+rs_basic <- fit_resamples(wf_basic, resamples =  Default_folds, control = ctrl_preds)
+
+head(rs_basic)
+```
+
+## ROC Curve
+
+From ROC curve we can see that it has pretty good upper-left bulging curve.
+
+```{r}
+augment(rs_basic) %>% 
+  roc_curve(truth = default, .pred_No) %>% 
+  autoplot()
+```
+
+This would result in AUC (area under the ROC curve) and accuracy close to 1.
+
+```{r}
+collect_metrics(rs_basic)
+```
+
+# Improve the Model
+
+As we can see from the beginning, removing `income` from predictor result in better estimation of test error by AIC and BIC.
+
+Now, I will remove `income` from the recipes:
+
+```{r rec_simple}
+rec_simple <- rec_basic %>% 
+  remove_role(income, old_role = "predictor")
+
+summary(rec_simple)
+```
+
+And I will update the WorkFlow
+
+```{r wf_simple}
+wf_simple <- workflow(rec_simple, glm_spec)
+```
+
+Then the rest is the same. So, I wrote a simple wrapper function to do it.
+
+```{r update_workflow}
+update_workflow <- function(wf) {
+
+  ctrl_preds <- control_resamples(save_pred = TRUE)
+  rs <- fit_resamples(wf, resamples = Default_folds, control = ctrl_preds)
+  rs
+  
+}
+
+rs_simple <- update_workflow(wf_simple)
+```
+
+```{r rs_ls}
+rs_ls <- list("All Predictors" = rs_basic,
+              "student + balance" = rs_simple)
+```
+
+```{r roc_df}
+roc_df <- rs_ls %>% 
+  map_dfr(~augment(.x) %>% roc_curve(truth = default, .pred_No),
+      .id = "Predictors"
+      )
+```
+
+## ROC curve of the improved model
+
+This plot show **comparison of ROC curves** of the 2 logistic regression models.
+
+-   Red line shows model that use all predictors: `student`, `balance` and `income`.
+-   Blue line shows model that use 2 predictor: `student` and `balance`.
+
+```{r}
+roc_df %>% 
+  ggplot(aes(1-specificity, sensitivity, color = Predictors)) +
+  geom_line(size = 1, alpha = 0.6, linetype = "dashed") +
+  geom_abline(intercept = 0, slope = 1, linetype = "dotted")
+```
+
+```{r }
+rs_ls %>% 
+  map_dfr(
+    collect_metrics, .id = "Features"
+  )
+```
+
+You can see that a simpler model result in a similar (or may be slightly improved) AUC. So it's reasonable to prefer it over more complicated model.
+
+# Evaluate Model
+
+In this section, I will evaluate the simpler model with 2 predictors (`student`, `balance`).
+
+## Fit to Training data
+
+First, fit the model to training data.
+
+```{r Default_fit}
+Default_fit <- fit(wf_simple, Default_train)
+Default_fit
+```
+
+## Use Testing data to Predict
+
+Then, use test data to predict `default`.
+
+```{r Default_pred}
+Default_pred <- 
+  augment(Default_fit, Default_test) %>% 
+  bind_cols(
+    predict(Default_fit, Default_test, type = "conf_int")
+  )
+```
+
+```{r p2}
+library(latex2exp)
+p2 <- Default_pred %>% 
+  ggplot(aes(balance, .pred_Yes, fill = student)) +
+  geom_line(aes(color = student)) +
+  geom_ribbon(aes(ymin = .pred_lower_Yes, ymax = .pred_upper_Yes),
+              alpha = 0.3) +
+  scale_fill_brewer(palette = "Dark2") +
+  scale_color_brewer(palette = "Dark2") +
+  labs(y = TeX("$\\hat{p}(default)$"),
+       caption = "Area indicate 95% CI of the estimated probability") +
+  labs(title = "Predicted probability of default", 
+       subtitle = "by logistic regression with 2 predictors")
+
+p2 
+```
+
+```{r eval=FALSE}
+# ggplot2::ggsave(here("posts/2022-05-04_logreg-default/feature.png"), 
+#                 dpi = "retina", width = 25.6, height = 16, 
+#                 scale = 1, units = "cm")
+```
+
+
+This plot show estimated probability of `default` if we know the values of predictors: `student` and `balance` by using logistic regression model fitted on training data. The prediction was made by plugging test data to the model.
+
+# Summary Plot
+
+
+```{r p1-p2, echo=FALSE}
+#| column: screen-inset-shaded
+#| layout-nrow: 1
+p1
+p2
+```
+
+
+The left-sided plot showed default status by balance and student status as observed in the `Default` data set. After multivariate logistic regression model (`default` on `balance` and `student`) was fitted to the training data, the predicted probability of default using the model was shown in the right-sided plot.

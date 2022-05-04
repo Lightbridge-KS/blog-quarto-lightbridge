@@ -27,8 +27,13 @@ new_post_subdir <- function(name,
 ## Posts
 
 ```{r}
+# Penguin LM
 new_post_subdir("lm-penguins")
-
+# TIMI calc
 new_post_subdir("med-calc-timi")
+# Default Logistic Regression
+new_post_subdir("logreg-default")
 ```
+
+
 
