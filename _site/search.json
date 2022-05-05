@@ -126,27 +126,6 @@
     "text": "Create R Project directly from Shell\n\nThe Goal\nWhat I want to achieve is this…\nIf I run this command in shell,\nnewrpj \"foo\"\nthe R project “foo” should be created, then in my terminal it should cd to foo/ directory, and open foo.Rproj file in RStudio.\nWe’ll need to do a couple of things:\n\nExecute that R script from Shell, and also passing R project name as shell argument.\nPut all necessary R functions in an R script. I’ll call it new-rpj.R\nWrap all shell commands into one shell function\n\n\n\nExecute R Script from Shell\nCommand Line Basics for R Users show that Rscript command is the way to execute R script from shell.\nThe basic usage is quite simple.\nRscript \"/Users/kittipos/bin-ks/helper/R/new-rpg.R\" \"foo\"\nThis will execute new-rpj.R, and “foo” is a shell argument to be passed to the script.\n\n\nWrite R Script\nNow, let’s edit new-rpj.R\nnew-rpj.R\n# Retrieve Shell arguments\narg <- commandArgs(trailingOnly = TRUE)[1]\n\n# Show what parameter is being recieved\ncat(\"- Passing zsh parameter:\", arg)\n\n# Create R Project using name we've supply\nusethis::create_project(arg, rstudio = TRUE)\n\ncommandArgs() is a function to retrieve shell arguments, trailingOnly = TRUE will only get the one that we’ve supply, for more example see r-bloggers post.\nAssign the first shell argument to arg\ncat() to confirm the passing parameter.\nLastly, usethis::create_project() to create an R project with name from arg. Use rstudio = TRUE to also create .Rproj file.\n\nAfter saving this script new-rpg.R, try running this in the shell:\nRscript \"/Users/kittipos/bin-ks/helper/R/new-rpg.R\" \"foo\"\nIt should create R project “foo” as a sub-directory of your current working directory.\n\n\nWrap up everything\nFinally, let’s wrap-up everything by building newrpj function to create R project, change directory to the project folder, and open the project in RStudio.\nI store this function in r-proj.zsh which can be sourced by ~/.zshrc.\nr-proj.zsh\n#!/bin/zsh\n## Function to create new R Project, `cd` to the project, and open in RStudio\nnewrpj(){\n    # Create R project in a sub-directory with names from shell 1st argument\n    Rscript \"/Users/kittipos/bin-ks/helper/R/new-rpj.R\" \"$1\"\n    # Go into that sub-directory & Open R project in RStudio\n    cd \"$1\"\n    open *.Rproj\n}\n\nNotice $1 which is a shell variable that represents the first argument supplies to the newrpj() function, which, in this case, is an R project name.\n\nHere is the result of calling newrpj with argument “tester”\n\nCreated RStudio project named “tester”\nChange working directory to tester, and\nOpen RStudio"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "My Blog",
-    "section": "",
-    "text": "A Logistic Regression Model using R.\n\n\n\n\nR\n\n\nStats\n\n\nML\n\n\n\n\nPlaying with logistic regression model with Default dataset\n\n\n\n\n\n\nMay 4, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\nA Simple Calculator\n\n\n\n\nR\n\n\nMed\n\n\nCalculator\n\n\n\n\nHow to program a simple TIMI risk score calculator for STEMI\n\n\n\n\n\n\nMay 3, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nStats\n\n\nPenguins\n\n\n\n\nLinear models with palmerpenguins\n\n\n\n\n\n\nApr 3, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nShell\n\n\nFun-Idea\n\n\n\n\nA fun tutorial involving zsh & R code\n\n\n\n\n\n\nMar 17, 2022\n\n\nKittipos Sirivongrungson\n\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "Lightbridge",
-    "section": "",
-    "text": "Email\n  Github\n  Website\n\n  \n  \nHi 👋, I am a medical doctor who gains interest in software developing and data science. I love computer software and developing tools for others and myself to use in real life and also for fun.\nMy first programming language is R, and now it is my favorite tool to analyse data, build R-package, and build cool shiny application."
-  },
-  {
-    "objectID": "license.html",
-    "href": "license.html",
-    "title": "License",
-    "section": "",
-    "text": "© 2022 Lightbridge"
-  },
-  {
     "objectID": "posts/2022-05-04_logreg-default/index.html",
     "href": "posts/2022-05-04_logreg-default/index.html",
     "title": "Predicting Credit Card Default Status",
@@ -215,5 +194,26 @@
     "title": "Predicting Credit Card Default Status",
     "section": "Use Testing data to Predict",
     "text": "Use Testing data to Predict\nThen, use test data to predict default.\n\n\nCode\nDefault_pred <- \n  augment(Default_fit, Default_test) %>% \n  bind_cols(\n    predict(Default_fit, Default_test, type = \"conf_int\")\n  )\n\n\n\n\nCode\nlibrary(latex2exp)\np2 <- Default_pred %>% \n  ggplot(aes(balance, .pred_Yes, fill = student)) +\n  geom_line(aes(color = student)) +\n  geom_ribbon(aes(ymin = .pred_lower_Yes, ymax = .pred_upper_Yes),\n              alpha = 0.3) +\n  scale_fill_brewer(palette = \"Dark2\") +\n  scale_color_brewer(palette = \"Dark2\") +\n  labs(y = TeX(\"$\\\\hat{p}(default)$\"),\n       caption = \"Area indicate 95% CI of the estimated probability\") +\n  labs(title = \"Predicted probability of default\", \n       subtitle = \"by logistic regression with 2 predictors\")\n\np2 \n\n\n\n\n\nThis plot show estimated probability of default if we know the values of predictors: student and balance by using logistic regression model fitted on training data. The prediction was made by plugging test data to the model."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "My Blog",
+    "section": "",
+    "text": "A Logistic Regression Model using R.\n\n\n\n\nR\n\n\nStats\n\n\nML\n\n\n\n\nPlaying with logistic regression model with Default dataset\n\n\n\n\n\n\nMay 4, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\nA Simple Calculator\n\n\n\n\nR\n\n\nMed\n\n\nCalculator\n\n\n\n\nHow to program a simple TIMI risk score calculator for STEMI\n\n\n\n\n\n\nMay 3, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nStats\n\n\nPenguins\n\n\n\n\nLinear models with palmerpenguins\n\n\n\n\n\n\nApr 3, 2022\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nR\n\n\nShell\n\n\nFun-Idea\n\n\n\n\nA fun tutorial involving zsh & R code\n\n\n\n\n\n\nMar 17, 2022\n\n\nKittipos Sirivongrungson\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Lightbridge",
+    "section": "",
+    "text": "Email\n  Github\n  Website\n\n  \n  \nHi 👋, I am a medical doctor who gains interest in software developing and data science. I love computer software and developing tools for others and myself to use in real life and also for fun.\nMy first programming language is R, and now it is my favorite tool to analyse data, build R-package, and build cool shiny application."
+  },
+  {
+    "objectID": "license.html",
+    "href": "license.html",
+    "title": "License",
+    "section": "",
+    "text": "© 2022 Lightbridge"
   }
 ]
