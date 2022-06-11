@@ -1,6 +1,9 @@
 project:
   type: website
 
+# My Inform
+author: "Kittipos Sirivongrungson"
+
 website:
   title: "Lightbridge"
   navbar:
@@ -22,6 +25,10 @@ format:
     css: styles.css
     html-math-method: mathjax # mathjax (default), katex, mathml
 
+# freeze computational output
+# (see https://quarto.org/docs/projects/code-execution.html#freeze)
+execute: 
+  freeze: true
 
 csl: "_assets/csl/elsevier-with-titles.csl"
 
