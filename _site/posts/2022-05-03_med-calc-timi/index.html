@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-0.9.354">
+<meta name="generator" content="quarto-0.9.566">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -102,19 +102,20 @@ div.csl-indent {
 }
 </style>
 
+
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<meta name="quarto:offset" content="../../">
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link id="quarto-text-highlighting-styles" href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -177,6 +178,11 @@ div.csl-indent {
     <div class="quarto-title column-body">
       <h1 class="title">TIMI Risk Score for STEMI</h1>
             <p class="subtitle lead">A Simple Calculator</p>
+                  <div>
+        <div class="description">
+          How to program a simple TIMI risk score calculator for STEMI
+        </div>
+      </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">R</div>
                 <div class="quarto-category">Med</div>
@@ -185,15 +191,7 @@ div.csl-indent {
                   </div>
   </div>
     
-  <div>
-    <div class="description">
-      How to program a simple TIMI risk score calculator for STEMI
-    </div>
-  </div>
-
-
-
-
+  
   <div class="quarto-title-meta">
 
       <div>
@@ -288,7 +286,7 @@ div.csl-indent {
 <p>Odds of death is a ratio of the probability of death to the probability of survival; we can write the <a href="#eq-odds">Equation&nbsp;1</a> (<span class="math inline">\(p\)</span> denotes the probability of death).</p>
 <p><span id="eq-odds"><span class="math display">\[
 odd = \frac{p}{1-p}
-\qquad(1)\]</span></span></p>
+\tag{1}\]</span></span></p>
 <p>Rearranging terms <span class="math inline">\(p\)</span> to the left, we get:</p>
 <p><span class="math display">\[
 p = \frac{odd}{odd + 1}
@@ -317,6 +315,7 @@ p = \frac{odd}{odd + 1}
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>risk_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
+
 <table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -541,6 +540,7 @@ p = \frac{odd}{odd + 1}
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>          ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
+
 <table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -574,6 +574,7 @@ p = \frac{odd}{odd + 1}
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>patients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
+
 <table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -656,6 +657,7 @@ p = \frac{odd}{odd + 1}
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>patients_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
+
 <table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -693,6 +695,7 @@ p = \frac{odd}{odd + 1}
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(risk.score, odds.death<span class="fl">.30</span>d, p.death<span class="fl">.30</span>d, <span class="at">.after =</span> name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
+
 <table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>

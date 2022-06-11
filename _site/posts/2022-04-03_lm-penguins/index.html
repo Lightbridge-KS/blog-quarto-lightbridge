@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-0.9.354">
+<meta name="generator" content="quarto-0.9.566">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -102,19 +102,20 @@ div.csl-indent {
 }
 </style>
 
+
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<meta name="quarto:offset" content="../../">
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link id="quarto-text-highlighting-styles" href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -176,6 +177,11 @@ div.csl-indent {
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Linear Regression Models</h1>
+                  <div>
+        <div class="description">
+          Linear models with palmerpenguins
+        </div>
+      </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">R</div>
                 <div class="quarto-category">Stats</div>
@@ -184,15 +190,7 @@ div.csl-indent {
                   </div>
   </div>
     
-  <div>
-    <div class="description">
-      Linear models with palmerpenguins
-    </div>
-  </div>
-
-
-
-
+  
   <div class="quarto-title-meta">
 
       <div>
@@ -275,6 +273,7 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
+
 <table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -454,6 +453,7 @@ Goal
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>broom<span class="sc">::</span><span class="fu">glance</span>(pen_lm_fit_simple)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
+
 <table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -521,7 +521,7 @@ Model Summary
 <p>The estimated model coefficients can be written as <a href="#eq-pen-sim">Equation&nbsp;1</a>.</p>
 <p><span id="eq-pen-sim"><span class="math display">\[
 \widehat{Wt} = 7488.7 - 191.6 \times Bill.Depth
-\qquad(1)\]</span></span></p>
+\tag{1}\]</span></span></p>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -622,6 +622,7 @@ Compare Plots
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>broom<span class="sc">::</span><span class="fu">tidy</span>(pen_lm_fit_multi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
+
 <table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -672,6 +673,7 @@ Compare Plots
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>broom<span class="sc">::</span><span class="fu">glance</span>(pen_lm_fit_multi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
+
 <table class="table table-striped table-hover table-responsive" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -746,7 +748,7 @@ Model Summary
                &amp;+ 13.4 \times SP_{Chinstrap} \\
                &amp;+ 2238.7 \times SP_{Gentoo}
 \end{aligned}
-\qquad(2)\]</span></span></p>
+\tag{2}\]</span></span></p>
 <p>I use the notation <span class="math inline">\(Var_{LV}\)</span> to represent <strong>indicator variables</strong> for when the categorical variable takes a particular value. For example <span class="math inline">\(SP_{Chinstrap}\)</span> would take a value of 1 if the <code>species</code> is “Chinstrap”, and it would take a value of 0 otherwise. The same logic also applies to “Gentoo”.</p>
 <p>We have seen from the <a href="#fig-plot-lm2">Figure&nbsp;2</a> that the models can be visualized as 3 regression lines for each species. Now we shall see whether coefficient of the model agree with the plot.</p>
 <section id="slope" class="level3">
