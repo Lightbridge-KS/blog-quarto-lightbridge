@@ -1,8 +1,6 @@
 project:
   type: website
 
-# My Inform
-author: "Kittipos Sirivongrungson"
 
 website:
   title: "Lightbridge"
