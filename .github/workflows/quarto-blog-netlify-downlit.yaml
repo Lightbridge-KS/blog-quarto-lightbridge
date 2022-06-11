@@ -77,7 +77,7 @@ jobs:
       # Only install packages required to run downlit linking.
       # These are the only R packages required if you use `freeze`.
       - name: Install {downlit} and friends for code-link
-      - uses: r-lib/actions/setup-r-dependencies@v2
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
           # withr
           #  Required by downlit but not listed as a dependency right now
