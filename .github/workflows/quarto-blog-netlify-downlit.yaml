@@ -70,6 +70,12 @@ jobs:
           # uncomment below and fill to pin a version
           # version: 0.9.105
 
+      # Install libcurl manually, otherwise {curl} can't be installed
+      ## Solution from: https://github.com/r-lib/actions/issues/416#issuecomment-957604377
+      - name: Install libcurl
+        run: |
+          sudo apt-get install -y libcurl4-openssl-dev
+
       # Set up R Environment
       - name: Install R Environment {renv}
         uses: r-lib/actions/setup-renv@v2
