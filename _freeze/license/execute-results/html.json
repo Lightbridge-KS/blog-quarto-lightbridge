@@ -1,0 +1,14 @@
+{
+  "hash": "379f04978a7005176ea882a65181ac84",
+  "result": {
+    "markdown": "---\ntitle: \"License\"\n---\n\n\nMy blog posts are released under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).\n\n&copy; 2022 Lightbridge\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
