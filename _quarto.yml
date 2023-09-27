@@ -24,5 +24,6 @@ format:
 
 
 csl: "_assets/csl/elsevier-with-titles.csl"
+bibliography: "ref.bib"
 
 #"_assets/csl/american-statistical-association.csl"

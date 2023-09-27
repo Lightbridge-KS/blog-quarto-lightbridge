@@ -1,0 +1,425 @@
+---
+title: "Linear Model Subset Selection"
+subtitle: "A Tidy Approach"
+description: "Variable selection for linear model using best subset selection"
+date: "2023-09-27"
+draft: false # Will render locally only
+categories: ["R", "Stats", "ML"]
+image: feature.png
+execute: 
+  cache: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file()) # Set WD to Root
+here::i_am("posts/2023-09-27_lm-subset-select/index.qmd")
+library(here)
+```
+
+::: {.callout-note appearance="simple"}
+An example to perform variable selection using best subset selection method for a linear regression model in R by implementing: *tidy-styled* functions.
+:::
+
+This is a repost from [R-Pub](https://rpubs.com/Lightbridge/lm-subset-tidy).
+
+
+```{r set_up, message=FALSE}
+library(tidyverse)
+library(ISLR2) # For Dataset
+library(leaps)
+
+theme_set(theme_bw())
+```
+
+
+# Explore Data
+
+I will use `Hitters` dataset from `{ISLR2}` package [@ISLR2-PKG].
+
+Let's see what we've got. 
+
+**The goal here is to predict variable `Salary`.**
+
+```{r}
+names(Hitters)
+```
+
+
+```{r}
+dim(Hitters)
+```
+
+
+```{r}
+skimr::skim(Hitters)
+```
+
+## Missing Values
+
+Let's remove rows containg missing values.
+
+```{r}
+visdat::vis_miss(Hitters)
+```
+
+```{r}
+Hitters <- Hitters %>% na.omit()
+
+sum(is.na(Hitters$Salary))
+```
+
+
+# Subset Selection
+
+Which combinations of variables gives the lowest test error rate at each model sizes?
+
+## Best Subset Selection Method
+
+```{r}
+regfit.full <- leaps::regsubsets(Salary ~ ., Hitters)
+summary(regfit.full)
+```
+
+Try to include all predictors; I will increase `nvmax`.
+
+```{r}
+regfit.full <- regsubsets(Salary ~ ., data = Hitters,
+    nvmax = 19)
+reg.summary <- summary(regfit.full)
+reg.summary 
+```
+
+We can use `plot()` to show predictors included at each Cp, BIC, or Adjusted R-squared.
+
+```{r}
+plot(regfit.full, scale = "Cp")
+```
+
+# Evaluate Model Performance
+
+## Using Cp, BIC, Adjusted R Squared
+
+`broom::tidy()` can also be used in `regsubsets` class
+
+```{r}
+regfit_tidy <- broom::tidy(regfit.full)
+regfit_tidy 
+```
+
+```{r}
+regfit_tidy_prep <- regfit_tidy %>% 
+  rowwise() %>% 
+  mutate(pred_no = sum(c_across(AtBat:NewLeagueN)), .keep = "unused") %>% 
+  ungroup() 
+  
+regfit_tidy_prep
+```
+
+
+
+```{r include=FALSE, eval=FALSE}
+### How to Do it
+regfit_tidy_prep %>% 
+  
+  ggplot(aes(pred_no, mallows_cp, color = mallows_cp)) +
+  geom_point(show.legend = F) +
+  geom_line(show.legend = F) +
+  scale_color_viridis_c(option = "plasma", end = 0.8, direction = -1) +
+  labs(y = TeX("C_p", italic = TRUE), x = "Number of Predictors") +
+  annotate("point",  x = 10, y = 5.009317, shape = 4, size = 4, stroke = 0.5)
+```
+
+
+### Plotting $C_p$, BIC, $Adjusted R^2$
+
+Let's create method for `autoplot()` of class "regsubsets"
+
+
+```{r autoplot.regsubsets}
+autoplot.regsubsets <- function(x, 
+                                res = c("mallows_cp", "BIC","r.squared","adj.r.squared")
+                                ) {
+  
+  res <- match.arg(res)
+  res_sym <- dplyr::ensym(res)
+  
+  df_params <- broom::tidy(x)
+  df_reduced <- df_params %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      # Add Number of Predictors
+      pred_no = sum(dplyr::c_across(
+        !tidyselect::any_of(c("(Intercept)", "r.squared","adj.r.squared",
+                              "BIC","mallows_cp")))), .keep = "unused")  %>% 
+    dplyr::ungroup() 
+  
+  
+  ### Find X & Y-Coordinate of the best model 
+  #### i.e., lowest point for "mallows_cp", "BIC" and highest point for    "r.squared","adj.r.squared"
+  fun <- if(res %in% c("mallows_cp", "BIC")) min else max
+  
+  best_y <- fun(df_reduced[[res]])
+  best_x <- df_reduced %>% 
+      dplyr::filter(!!res_sym == fun(!!res_sym)) %>% dplyr::pull(pred_no)
+  
+  direction_col <- ifelse(res %in% c("mallows_cp", "BIC"), -1, 1)
+  
+  # Plot
+  df_reduced %>%
+    ggplot2::ggplot(ggplot2::aes(pred_no, !!res_sym, color = !!res_sym)) +
+    ggplot2::geom_point(show.legend = F) +
+    ggplot2::geom_line(show.legend = F) +
+    ggplot2::scale_color_viridis_c(option = "plasma", end = 0.8, 
+                                   direction = direction_col) +
+    ggplot2::annotate("point", x = best_x, y = best_y, shape = 4, size = 5, stroke = 0.5)+
+    ggplot2::labs(x = "Number of Predictors") 
+  
+}
+
+```
+
+
+
+
+```{r}
+library(patchwork)
+library(latex2exp)
+
+p_cp <- autoplot(regfit.full, res = "mallows_cp") +
+  labs(y = TeX("C_p"))
+
+p_bic <- autoplot(regfit.full, res = "BIC")
+
+p_adj_rsq <- autoplot(regfit.full, res = "adj.r.squared") +
+  labs(y = TeX("Adjusted R^2"))
+
+p_cp + p_bic + p_adj_rsq +
+  plot_annotation(title = "Best Subset Selection at Each Model Sizes", 
+                  subtitle = TeX("Estimate test error by C_p, BIC, and Adjusted R^2"),
+                  caption = "Data from Hitters dataset in ISLR2 package")
+  
+```
+
+```{r include=FALSE}
+lbr::ggsave_mac(here("posts/2023-09-27_lm-subset-select/plot/Hitters_BestSubset.png"))
+```
+
+
+## Using Cross-Validation
+
+I need to build a lot of helper functions.
+
+### Predict Method for "regsubsets"
+
+"regsubsets" object has no `predict()` method, so we need to create ourselves.
+
+Luckily, `ISLR`'s lab demonstration already included `predict.regsubsets()` in the R-Markdown material. 
+
+I will modify it a little bit so that it returns a vector instead of matrix.
+
+```{r predict.regsubsets}
+predict.regsubsets <- function(object, newdata, id, ...) {
+  form <- as.formula(object[["call"]][[2]])
+  mat <- model.matrix(form, newdata)
+  coefi <- coef(object, id = id)
+  xvars <- names(coefi)
+  # Matrix
+  pred_mat <- mat[, xvars] %*% coefi
+  # Vector
+  pred <- as.numeric(pred_mat)
+  names(pred) <- rownames(mat)
+  pred
+}
+
+predict(regfit.full, newdata = Hitters, id = 3) %>% head()
+```
+
+
+### Model Summary for "regsubsets"
+
+Next, I will implement `broom::glance()` method for "regsubsets" object.
+This will provide a models summary at each number of predictors.
+
+```{r glance.regsubsets}
+glance.regsubsets <- function(x, newdata, ...) {
+  
+  n_predictors <- x$np - 1
+  y_var <- as.formula(x$call[[2]])[[2]]
+  y <- newdata[[y_var]]
+  
+  mse <- numeric(n_predictors)
+  
+  for (i in 1:n_predictors) {
+    y_hat_i <- predict.regsubsets(x, newdata, id = i, ...)
+
+    # Mean Squared Error
+    mse[[i]] <- mean(c(y - y_hat_i)^2)
+  }
+  
+  
+  tibble::tibble(
+    n_predictors = 1:n_predictors,
+    MSE = mse,
+    r.squared = summary(x)[["rsq"]],
+    adj.r.squared = summary(x)[["adjr2"]],
+    mallows_cp = summary(x)[["cp"]],
+    BIC = summary(x)[["bic"]]
+  )
+  
+}
+
+broom::glance(regfit.full, newdata = Hitters)
+```
+
+
+### Split Data into Folds
+
+Now, let's split data into 10-fold using `vfold_cv()` function from `{rsample}` package.
+
+```{r}
+library(rsample)
+```
+
+```{r vfold_cv}
+set.seed(123)
+
+Hitters_folds <- vfold_cv(Hitters, v = 10) 
+
+class(Hitters_folds)
+Hitters_folds
+```
+
+Analysis (train) and Assessment (hold-out) data can be obtained by `analysis()` and `assessment()`, respectively.
+
+```{r}
+Hitters_folds$splits[[1]] %>% analysis()
+Hitters_folds$splits[[1]] %>% assessment()
+```
+
+Up next, `regsubsets_cv_glance()` will compute cross-validation's summary statistics using method and functions that I've just defined above.
+
+
+```{r regsubsets_cv_glance}
+regsubsets_cv_glance <- function(x, vfold_cv, return_folds = FALSE, ...) {
+  
+ # Add analysis & assess DF
+ vfold_cv <- vfold_cv %>% 
+   dplyr::mutate(
+     analysis_df = purrr::map(splits, rsample::analysis),
+     assess_df = purrr::map(splits, rsample::assessment)
+     ) 
+  
+  # Fit `regsubsets` to each folds
+  fitted_folds <- vector("list", nrow(vfold_cv))
+  n_predictors <- ncol(vfold_cv$analysis_df[[1]]) - 1 # Number of Predictors
+
+  for (i in 1:nrow(vfold_cv)) {
+    fitted_folds[[i]] <-
+      leaps::regsubsets(x, data = vfold_cv$analysis_df[[i]], nvmax = n_predictors, ...)
+    names(fitted_folds) <- 
+      sprintf(paste0("Fold%0", nchar(nrow(vfold_cv)), "d"), 1:nrow(vfold_cv))
+  }
+  
+  params_df <- purrr::map2_dfr(
+    .x = fitted_folds,
+    .y = vfold_cv$assess_df,
+    # Compute multi-models summary at each folds
+    ~broom::glance(.x, newdata = .y), 
+    .id = "id"
+    ) %>% 
+    dplyr::select(id, n_predictors, MSE, r.squared)
+  
+  if(return_folds) return(params_df)
+  
+  params_df %>% 
+    dplyr::group_by(n_predictors) %>% 
+    dplyr::summarise(across(MSE:r.squared, mean, .names = "{.col}_cv"))
+
+}
+
+regsubsets_cv_glance(Salary ~ ., Hitters_folds, F) 
+```
+
+## Compute Cross-Validation Estimates
+
+`MSE_cv` is a mean squared error at each predictor subsets; each `MSE_cv` is averaged over 10 held-out sets.
+
+```{r Hitters_cv_fitted}
+Hitters_cv_fitted <- regsubsets_cv_glance(Salary ~ ., Hitters_folds) 
+
+Hitters_cv_fitted
+```
+
+## Plotting Cross-Validation Estimates
+
+The Final helper functions, `regsubsets_cv_plot()`, is for plotting 10-fold Cross-Validation MSE at each number of predictors.
+
+```{r regsubsets_cv_plot}
+regsubsets_cv_plot <- function(df_glanced, 
+                               res = c("MSE_cv","r.squared_cv")
+                          ) {
+  
+  res <- match.arg(res)
+  res_sym <- dplyr::ensym(res)
+  
+  ### Find X & Y-Coordinate of the best model 
+  fun <- if(res %in% c("MSE_cv")) min else max
+  
+  best_y <- fun(df_glanced[[res]])
+  best_x <- df_glanced %>%
+      dplyr::filter(!!res_sym == fun(!!res_sym)) %>% dplyr::pull(n_predictors)
+
+  direction_col <- ifelse(res %in% c("MSE_cv"), -1, 1)
+  
+  # Plot
+  df_glanced %>%
+    ggplot2::ggplot(ggplot2::aes(n_predictors, !!res_sym, color = !!res_sym)) +
+    ggplot2::geom_point(show.legend = F) +
+    ggplot2::geom_line(show.legend = F) +
+    ggplot2::scale_color_viridis_c(option = "plasma", end = 0.8,
+                                   direction = direction_col) +
+    ggplot2::annotate("point", x = best_x, y = best_y, shape = 4, size = 5, stroke = 0.5)+
+    ggplot2::labs(x = "Number of Predictors")
+}
+```
+
+```{r}
+regsubsets_cv_plot(Hitters_cv_fitted, "MSE_cv") +
+  labs(title = "Best Subset Selection by 10-Fold Cross-Validation",
+       y = TeX("MSE_{10-fold-CV}")
+       )
+```
+
+# Final Comparisons
+
+To see the overall picture, All methods that estimate the test error that we've explored so far will be plotted in this final plots. "X" symbols indicate the best model for each methods.
+
+```{r}
+library(patchwork)
+library(latex2exp)
+
+p_cp <- autoplot(regfit.full, res = "mallows_cp") +
+  labs(y = TeX("C_p"))
+
+p_bic <- autoplot(regfit.full, res = "BIC")
+
+p_adj_rsq <- autoplot(regfit.full, res = "adj.r.squared") +
+  labs(y = TeX("Adjusted R^2"))
+
+p_mse_cv <- regsubsets_cv_plot(Hitters_cv_fitted, "MSE_cv") +
+  labs(y = TeX("MSE_{10-fold-CV}"))
+
+p_cp + p_bic + p_adj_rsq + p_mse_cv +
+  plot_annotation(title = "Best Subset Selection", 
+                  subtitle = TeX("Estimate test error by C_p, BIC, Adjusted R^2, and 10-fold Cross-Validation"),
+                  caption = "Data from Hitters dataset in ISLR2 package")
+```
+```{r include=FALSE}
+lbr::ggsave_mac(here("posts/2023-09-27_lm-subset-select/plot/Hitters_BestSubsetAll.png"))
+```
+
+
+```{r}
+devtools::session_info()
+```
+
