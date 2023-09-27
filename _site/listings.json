@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-09-27_lm-subset-select/index.html",
       "/posts/2022-05-04_logreg-default/index.html",
       "/posts/2022-05-03_med-calc-timi/index.html",
       "/posts/2022-04-03_lm-penguins/index.html",
