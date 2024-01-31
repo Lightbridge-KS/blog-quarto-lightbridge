@@ -1,8 +1,16 @@
+# Thanks:
+## Silva for examples and themes <https://github.com/spcanelon/silvia/blob/main/_quarto.yml>
+## How to add a11y-theme <https://mine-cetinkaya-rundel.github.io/quarto-tip-a-day/posts/29-a11y-theme/>
+
 project:
   type: website
 
 website:
   title: "Lightbridge"
+  description: "Medical doctor and R & Python developer"
+  site-url: "https://lightbridge-blog.netlify.app"
+  page-navigation: true
+  back-to-top-navigation: false
   navbar:
     right:
       - text: "About"
@@ -18,12 +26,20 @@ website:
         file: license.qmd
 format:
   html:
-    theme: Flatly
-    css: styles.css
+    theme: 
+    - morph
+    - styles.scss
+    highlight-style: a11y-dark
+    code-copy: true
     html-math-method: mathjax # mathjax (default), katex, mathml
+    toc-depth: 4
 
 
 csl: "_assets/csl/elsevier-with-titles.csl"
 bibliography: "ref.bib"
 
 #"_assets/csl/american-statistical-association.csl"
+
+# freeze computational output
+# (see https://quarto.org/docs/projects/code-execution.html#freeze)
+freeze: true

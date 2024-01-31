@@ -1,0 +1,135 @@
+/*-- scss:defaults --*/
+// Quarto base morph theme: https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/formats/html/bootstrap/themes/morph.scss
+
+//
+// Color system
+//
+
+$white:    #fff !default;
+$gray-100: #f0f5fa !default;
+$gray-200: #d9e3f1 !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #bed1e6 !default;
+$gray-500: #adb5bd !default;
+$gray-600: #7f8a99 !default;
+$gray-700: #7b8ab8 !default;
+
+$my-gray-750: #444c65 !default; // MyHex
+
+$gray-800: #444b40 !default;
+$gray-900: #212529 !default;
+$black:    #000 !default;
+
+$blue:    #378dfc !default;
+
+$darkblue: #2a4975 !default;
+
+$indigo:  #7410ee !default;
+$purple:  #5b62f4 !default;
+
+$darkpurple: #6a44b2 !default;
+
+$pink:    #d63384 !default;
+$red:     #e52527 !default;
+$maroon:  #800000;
+$orange:  #fd7e14 !default;
+$yellow:  #ffc107 !default;
+$green:   #43cc29 !default;
+
+$darkgreen:   #3d7765 !default;
+
+$teal:    #20c997 !default;
+$cyan:    #0dcaf0 !default;
+
+/* SCSS HEX */
+// https://coolors.co/palette/ccd5ae-e9edc9-fefae0-faedcd-d4a373
+$tea-green: #ccd5aeff;
+$beige: #e9edc9ff;
+$cornsilk: #fefae0ff;
+$papaya-whip: #faedcdff;
+$papaya-whip-darker: rgb(255, 240, 203);
+$buff: #d4a373ff;
+
+/* SCSS HEX */
+// https://coolors.co/606c38-283618-fefae0-dda15e-bc6c25
+$dark-moss-green: #606c38ff;
+$pakistan-green: #283618ff;
+$earth-yellow: #dda15eff;
+$tigers-eye: #bc6c25ff;
+
+/* MyHex */
+$my-cornsilk: rgb(254, 249, 238);
+
+
+$primary:       $papaya-whip !default; // $blue
+$secondary:     $gray-200 !default;
+$success:       $green !default;
+$info:          $purple !default;
+$warning:       $yellow !default;
+$danger:        $red !default;
+$light:         $gray-100 !default;
+$dark:          $gray-900 !default;
+
+$min-contrast-ratio:   1.5 !default;
+
+$enable-shadows:              true !default;
+
+// Body
+
+$body-bg:                   $my-cornsilk !default; // $gray-200
+$body-color:                $my-gray-750 !default; // $gray-700
+
+// Links
+
+$link-color: lighten($maroon, 10%) !default; // darken($body-color, 20%)
+
+// Components
+
+$border-width:                1.5px !default; // 0 !default;
+$border-color:                rgba(darken($body-bg, 70%), .1) !default; // rgba(darken($body-bg, 50%), .1) !default;
+
+
+// Fonts
+// stylelint-disable-next-line value-keyword-case
+// @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display&display=swap');
+
+$font-family-sans-serif:      Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+// $font-family-sans-serif:      "Red Hat Display", Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+
+$headings-color:              darken($body-color, 10%) !default; // $link-color
+
+$text-muted:                  lighten($body-color, 15%) !default; 
+
+
+// Dropdowns
+$dropdown-bg:                       rgba($gray-100, .8) !default;
+
+
+// Popovers
+// The background color for popovers (for example, when a citation preview is shown).
+$popover-bg:                        $dropdown-bg !default;
+$popover-header-bg:                 transparent !default; 
+
+
+/*-- scss:rules --*/
+/* Heading 1 */
+h1, h1 span.header-section-number {
+    color: $darkgreen;
+}
+
+/* Heading 2 */
+h2, h2 span.header-section-number {
+  color: $darkblue;
+  
+}
+
+/* Heading 3 */
+h3, h3 span.header-section-number {
+//   color: $darkpurple;
+  color: $maroon;
+}
+
+/* Heading 4 */
+h4, h4 span.header-section-number {
+  color: $pink;
+}
