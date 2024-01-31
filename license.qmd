@@ -4,4 +4,10 @@ title: "License"
 
 My blog posts are released under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).
 
-&copy; `r format(Sys.Date(), format = "%Y")` Lightbridge
+```{r}
+#| include: false
+t <- format(Sys.Date(), format = "%Y")
+```
+
+
+&copy; `r t` Lightbridge
